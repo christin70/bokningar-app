@@ -1,211 +1,247 @@
 <!DOCTYPE html>
 <html lang="sv">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#175c4d" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#155e4b">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Bokningar">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
   <title>Bokningar</title>
   <style>
-
-:root {
-  --bg: #f4f7f5;
-  --card: #ffffff;
-  --text: #17332c;
-  --muted: #6e7d78;
-  --brand: #175c4d;
-  --brand-soft: #dff0e9;
-  --danger: #a93333;
-  --border: #dce5e1;
-  --shadow: 0 10px 30px rgba(23, 51, 44, .08);
-}
-* { box-sizing: border-box; }
-body { margin: 0; font-family: Inter, ui-sans-serif, system-ui, -apple-system, Arial; background: var(--bg); color: var(--text); }
-button, input, select, textarea { font: inherit; }
-button { cursor: pointer; }
-.screen { min-height: 100dvh; }
-.hidden { display: none !important; }
-.centered { display: grid; place-items: center; padding: 24px; }
-.card { background: var(--card); border: 1px solid var(--border); border-radius: 22px; box-shadow: var(--shadow); padding: 20px; }
-.login-card { width: min(420px, 100%); text-align: center; }
-.logo { width: 64px; height: 64px; border-radius: 18px; display: grid; place-items: center; margin: 0 auto 12px; background: var(--brand); color: white; font-weight: 800; font-size: 30px; }
-h1, h2, h3, p { margin-top: 0; }
-.muted { color: var(--muted); }
-.eyebrow { margin-bottom: 4px; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
-label { display: grid; gap: 7px; text-align: left; margin: 14px 0; font-weight: 650; }
-input, select, textarea { width: 100%; border: 1px solid var(--border); border-radius: 13px; padding: 13px; background: white; color: var(--text); }
-.primary, .ghost, .danger { border: 0; border-radius: 13px; padding: 12px 15px; font-weight: 750; }
-.primary { background: var(--brand); color: white; }
-.ghost { background: var(--brand-soft); color: var(--brand); }
-.danger { background: #f9e4e4; color: var(--danger); }
-.login-card .primary { width: 100%; }
-.topbar { position: sticky; top: 0; z-index: 5; display: flex; justify-content: space-between; align-items: center; padding: 16px 18px; background: rgba(244,247,245,.94); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); }
-.topbar h1 { margin: 0; font-size: 24px; }
-main { max-width: 900px; margin: 0 auto; padding: 18px 16px 105px; }
-.tab { display: none; }
-.tab.active { display: block; }
-.hero, .resource-header { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 22px; }
-.booking-list { display: grid; gap: 12px; }
-.booking { display: flex; justify-content: space-between; align-items: center; gap: 14px; background: var(--card); border: 1px solid var(--border); border-left: 6px solid var(--brand); border-radius: 16px; padding: 15px; }
-.booking h4 { margin: 0 0 5px; }
-.booking p { margin: 0; color: var(--muted); font-size: 14px; }
-.booking button { border: 0; background: #f9e4e4; color: var(--danger); border-radius: 10px; padding: 9px; }
-.month-nav { display: flex; align-items: center; justify-content: space-between; }
-.month-nav h3 { margin: 0; text-transform: capitalize; }
-.weekdays, .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
-.weekdays { margin: 18px 0 8px; color: var(--muted); font-size: 12px; text-align: center; }
-.day { min-height: 58px; border-radius: 12px; padding: 7px; border: 1px solid var(--border); background: #fbfdfc; font-size: 13px; }
-.day.empty { border-color: transparent; background: transparent; }
-.day.booked { background: #f7dddd; border-color: #efbcbc; }
-.day.today { outline: 2px solid var(--brand); }
-.day small { display: block; margin-top: 5px; color: var(--danger); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.bottom-nav { position: fixed; left: 0; right: 0; bottom: 0; z-index: 10; display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; padding: 8px 8px calc(8px + env(safe-area-inset-bottom)); background: white; border-top: 1px solid var(--border); }
-.bottom-nav button { display: grid; place-items: center; gap: 3px; border: 0; border-radius: 12px; background: transparent; color: var(--muted); padding: 8px 2px; font-size: 18px; }
-.bottom-nav button span { font-size: 10px; }
-.bottom-nav button.active { background: var(--brand-soft); color: var(--brand); }
-dialog { width: min(480px, calc(100% - 24px)); border: 0; border-radius: 22px; padding: 0; box-shadow: 0 25px 80px rgba(0,0,0,.25); }
-dialog::backdrop { background: rgba(7,24,20,.55); backdrop-filter: blur(3px); }
-dialog form { padding: 22px; }
-.dialog-head { display: flex; justify-content: space-between; align-items: start; }
-.error { color: var(--danger); min-height: 20px; font-size: 14px; }
-@media (max-width: 600px) {
-  .hero { align-items: stretch; flex-direction: column; }
-  .resource-header { align-items: center; }
-  .day { min-height: 47px; padding: 5px; }
-  .day small { display: none; }
-}
-
-</style>
+    :root{
+      --bg:#f4f7f5;--card:#fff;--text:#17332c;--muted:#6b7c76;--brand:#155e4b;
+      --brand2:#1f8067;--soft:#dff1ea;--border:#dbe5e1;--danger:#a53232;
+      --mine:#fff2bf;--busy:#f7dddd;--free:#e7f5ec;--shadow:0 12px 35px rgba(20,65,52,.09)
+    }
+    *{box-sizing:border-box} body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Arial;background:var(--bg);color:var(--text)}
+    button,input,textarea,select{font:inherit} button{cursor:pointer}.hidden{display:none!important}
+    .screen{min-height:100dvh}.centered{display:grid;place-items:center;padding:24px}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:22px;box-shadow:var(--shadow)}
+    .login-card{width:min(420px,100%);padding:24px;text-align:center}.logo{width:68px;height:68px;border-radius:20px;background:var(--brand);color:#fff;display:grid;place-items:center;margin:0 auto 14px;font-weight:900;font-size:31px}
+    h1,h2,h3,h4,p{margin-top:0}.muted{color:var(--muted)}.eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:800;color:var(--muted);margin-bottom:5px}
+    label{display:grid;gap:7px;text-align:left;margin:14px 0;font-weight:700}input,textarea,select{width:100%;border:1px solid var(--border);border-radius:14px;padding:13px;background:#fff;color:var(--text)}
+    .primary,.ghost,.danger{border:0;border-radius:14px;padding:12px 15px;font-weight:800}.primary{background:var(--brand);color:#fff}.primary:hover{background:var(--brand2)}.ghost{background:var(--soft);color:var(--brand)}.danger{background:#f9e3e3;color:var(--danger)}
+    .login-card .primary{width:100%}.error{color:var(--danger);min-height:20px;font-size:14px}
+    .topbar{position:sticky;top:0;z-index:10;background:rgba(244,247,245,.94);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:14px 16px}
+    .toprow{max-width:980px;margin:auto;display:flex;justify-content:space-between;align-items:center;gap:12px}.topbar h1{margin:0;font-size:24px}
+    main{max-width:980px;margin:auto;padding:18px 15px 110px}.hero{padding:22px;margin-bottom:20px;background:linear-gradient(145deg,#fff,#eef8f3)}
+    .hero-row{display:flex;justify-content:space-between;align-items:center;gap:18px}.hero h2{font-size:28px;margin-bottom:6px}
+    .resource-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+    .resource-card{padding:18px;min-height:170px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden}
+    .resource-card::after{content:"";position:absolute;width:110px;height:110px;border-radius:50%;right:-32px;top:-32px;background:color-mix(in srgb,var(--accent) 16%,white)}
+    .resource-icon{font-size:34px}.resource-card h3{font-size:22px;margin:8px 0}.status{font-weight:800}.resource-actions{display:flex;gap:8px;margin-top:14px}.resource-actions button{flex:1}
+    .tab{display:none}.tab.active{display:block}.resource-header{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:18px;margin-bottom:16px}
+    .month-nav{display:flex;justify-content:space-between;align-items:center}.calendar-card{padding:17px}.weekdays,.calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+    .weekdays{margin:16px 0 8px;text-align:center;color:var(--muted);font-size:12px}.day{min-height:70px;border:1px solid var(--border);border-radius:13px;padding:7px;background:var(--free);position:relative}
+    .day.empty{background:transparent;border-color:transparent}.day.busy{background:var(--busy)}.day.mine{background:var(--mine)}.day.today{outline:2px solid var(--brand)}.day button{position:absolute;inset:0;border:0;background:transparent;border-radius:13px}
+    .day small{display:block;margin-top:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:11px}.booking-list{display:grid;gap:11px;margin-top:12px}
+    .booking{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:15px;border-left:6px solid var(--brand)}.booking h4{margin:0 0 4px}.booking p{margin:0;color:var(--muted);font-size:14px}
+    .section-head{display:flex;justify-content:space-between;align-items:center;margin:22px 0 10px}.resource-admin{display:grid;gap:10px}.admin-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px}
+    .bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:20;background:#fff;border-top:1px solid var(--border);display:grid;grid-template-columns:repeat(3,1fr);padding:8px 8px calc(8px + env(safe-area-inset-bottom))}
+    .bottom-nav button{border:0;background:transparent;border-radius:13px;padding:8px;color:var(--muted);font-weight:800}.bottom-nav button.active{background:var(--soft);color:var(--brand)}.bottom-nav span{display:block;font-size:10px;margin-top:3px}
+    dialog{width:min(500px,calc(100% - 24px));border:0;border-radius:22px;padding:0;box-shadow:0 25px 90px rgba(0,0,0,.27)}dialog::backdrop{background:rgba(5,23,18,.57);backdrop-filter:blur(3px)}
+    dialog form{padding:22px}.dialog-head{display:flex;justify-content:space-between;align-items:start}.color-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .pillbar{display:flex;gap:8px;overflow-x:auto;padding:0 0 12px;scrollbar-width:none}.pillbar::-webkit-scrollbar{display:none}.pill{white-space:nowrap;border:1px solid var(--border);background:#fff;border-radius:999px;padding:10px 14px;font-weight:800}.pill.active{background:var(--brand);color:#fff}
+    @media(max-width:600px){.hero-row,.resource-header{align-items:stretch;flex-direction:column}.hero-row .primary,.resource-header .primary{width:100%}.day{min-height:53px;padding:5px}.day small{display:none}.resource-grid{grid-template-columns:1fr}.color-row{grid-template-columns:1fr}}
+  </style>
 </head>
 <body>
-  <div id="loginView" class="screen centered">
-    <section class="card login-card">
-      <div class="logo">B</div>
-      <h1>Bokningar</h1>
-      <p class="muted">Familjens gemensamma bokningsapp</p>
-      <form id="loginForm">
-<label>E-postadress<input id="emailInput" type="email" autocomplete="username" required></label>
-<label>Lösenord<input id="passwordInput" type="password" autocomplete="current-password" required></label>
-<p id="loginError" class="error"></p>
-<button type="submit" class="primary">Logga in</button>
-</form>
-    </section>
-  </div>
-
-  <div id="appView" class="screen hidden">
-    <header class="topbar">
-      <div>
-        <p class="eyebrow">Bokningar.app</p>
-        <h1 id="pageTitle">Hem</h1><small id="syncStatus" class="muted">Ansluter…</small>
-      </div>
-      <button id="logoutBtn" class="ghost">Logga ut</button>
-    </header>
-
-    <main>
-      <section id="homeTab" class="tab active">
-        <div class="hero card">
-          <div>
-            <p class="eyebrow">Välkommen</p>
-            <h2 id="welcomeName"></h2>
-            <p class="muted">Här ser du familjens kommande bokningar.</p>
-          </div>
-          <button class="primary" data-open="Bilbokning">+ Ny bokning</button>
-        </div>
-        <h3>Kommande bokningar</h3>
-        <div id="upcomingList" class="booking-list"></div>
-      </section>
-
-      <section id="resourceTab" class="tab">
-        <div class="resource-header card">
-          <div>
-            <p class="eyebrow">Kalender</p>
-            <h2 id="resourceTitle">Bilbokning</h2>
-          </div>
-          <button id="newBookingBtn" class="primary">+ Boka</button>
-        </div>
-        <div class="card">
-          <div class="month-nav">
-            <button id="prevMonth" class="ghost">‹</button>
-            <h3 id="monthLabel"></h3>
-            <button id="nextMonth" class="ghost">›</button>
-          </div>
-          <div class="weekdays">
-            <span>Mån</span><span>Tis</span><span>Ons</span><span>Tor</span><span>Fre</span><span>Lör</span><span>Sön</span>
-          </div>
-          <div id="calendarGrid" class="calendar-grid"></div>
-        </div>
-        <h3>Bokningar</h3>
-        <div id="resourceBookings" class="booking-list"></div>
-      </section>
-
-      <section id="settingsTab" class="tab">
-        <div class="card">
-          <h2>Inställningar</h2>
-          <p>Inloggad som <strong id="settingsUser"></strong>.</p>
-          <p class="muted">Bokningarna sparas gemensamt i Firebase och uppdateras i realtid.</p>
-        </div>
-      </section>
-    </main>
-
-    <nav class="bottom-nav">
-      <button data-tab="Hem" class="active">⌂<span>Hem</span></button>
-      <button data-tab="Bilbokning">🚗<span>Bilbokning</span></button>
-      <button data-tab="Gotland">🏝️<span>Gotland</span></button>
-      <button data-tab="Bäcköra">🏡<span>Bäcköra</span></button>
-      <button data-tab="Inställningar">⚙️<span>Inställningar</span></button>
-    </nav>
-  </div>
-
-  <dialog id="bookingDialog">
-    <form id="bookingForm" method="dialog">
-      <div class="dialog-head">
-        <div>
-          <p class="eyebrow">Ny bokning</p>
-          <h2 id="dialogResource">Bilbokning</h2>
-        </div>
-        <button type="button" id="closeDialog" class="ghost">✕</button>
-      </div>
-      <label>Från
-        <input id="startDate" type="date" required />
-      </label>
-      <label>Till
-        <input id="endDate" type="date" required />
-      </label>
-      <label>Kommentar
-        <textarea id="comment" rows="3" placeholder="Valfritt"></textarea>
-      </label>
-      <p id="formError" class="error"></p>
-      <button type="submit" class="primary">Spara bokning</button>
+<div id="loginView" class="screen centered">
+  <section class="card login-card">
+    <div class="logo">B</div><h1>Bokningar</h1><p class="muted">Familjens gemensamma bokningsapp</p>
+    <form id="loginForm">
+      <label>E-postadress<input id="emailInput" type="email" autocomplete="username" required></label>
+      <label>Lösenord<input id="passwordInput" type="password" autocomplete="current-password" required></label>
+      <p id="loginError" class="error"></p><button class="primary" type="submit">Logga in</button>
     </form>
-  </dialog>
+  </section>
+</div>
 
-  <script type="module">
+<div id="appView" class="screen hidden">
+  <header class="topbar"><div class="toprow">
+    <div><p class="eyebrow">Bokningar</p><h1 id="pageTitle">Översikt</h1><small id="syncStatus" class="muted">Ansluter…</small></div>
+    <button id="logoutBtn" class="ghost">Logga ut</button>
+  </div></header>
+  <main>
+    <section id="homeTab" class="tab active">
+      <div class="card hero"><div class="hero-row"><div><p class="eyebrow">Välkommen</p><h2 id="welcomeName">Christin</h2><p class="muted">Se vad som är ledigt och boka direkt.</p></div><button id="quickBookBtn" class="primary">+ Ny bokning</button></div></div>
+      <div class="section-head"><h2>Bokningsobjekt</h2><button id="addResourceTop" class="ghost admin-only hidden">+ Lägg till</button></div>
+      <div id="resourceGrid" class="resource-grid"></div>
+      <div class="section-head"><h2>Kommande bokningar</h2></div><div id="upcomingList" class="booking-list"></div>
+    </section>
+
+    <section id="resourceTab" class="tab">
+      <div id="resourcePills" class="pillbar"></div>
+      <div class="card resource-header"><div><p class="eyebrow">Kalender</p><h2 id="resourceTitle"></h2></div><button id="newBookingBtn" class="primary">+ Boka</button></div>
+      <div class="card calendar-card"><div class="month-nav"><button id="prevMonth" class="ghost">‹</button><h3 id="monthLabel"></h3><button id="nextMonth" class="ghost">›</button></div><div class="weekdays"><span>Mån</span><span>Tis</span><span>Ons</span><span>Tor</span><span>Fre</span><span>Lör</span><span>Sön</span></div><div id="calendarGrid" class="calendar-grid"></div></div>
+      <div class="section-head"><h2>Bokningar</h2></div><div id="resourceBookings" class="booking-list"></div>
+    </section>
+
+    <section id="settingsTab" class="tab">
+      <div class="card" style="padding:20px;margin-bottom:16px"><h2>Min profil</h2><p>Inloggad som <strong id="settingsUser"></strong></p>
+        <form id="profileForm"><label>Visningsnamn<input id="displayNameInput" maxlength="40" required></label><button class="primary" type="submit">Spara namn</button><p id="profileMsg" class="error"></p></form>
+      </div>
+      <div id="adminSection" class="hidden"><div class="section-head"><h2>Hantera bokningsobjekt</h2><button id="addResourceBtn" class="primary">+ Nytt objekt</button></div><div id="resourceAdminList" class="resource-admin"></div></div>
+    </section>
+  </main>
+  <nav class="bottom-nav">
+    <button data-tab="home" class="active">⌂<span>Översikt</span></button>
+    <button data-tab="calendar">▦<span>Kalender</span></button>
+    <button data-tab="settings">⚙<span>Inställningar</span></button>
+  </nav>
+</div>
+
+<dialog id="bookingDialog"><form id="bookingForm" method="dialog">
+  <div class="dialog-head"><div><p class="eyebrow">Ny bokning</p><h2 id="dialogResource"></h2></div><button type="button" class="ghost" data-close="bookingDialog">✕</button></div>
+  <label>Från<input id="startDate" type="date" required></label><label>Till<input id="endDate" type="date" required></label>
+  <label>Kommentar<textarea id="comment" rows="3" placeholder="Valfritt"></textarea></label><p id="formError" class="error"></p><button class="primary" type="submit">Spara bokning</button>
+</form></dialog>
+
+<dialog id="resourceDialog"><form id="resourceForm" method="dialog">
+  <div class="dialog-head"><div><p class="eyebrow">Bokningsobjekt</p><h2 id="resourceDialogTitle">Lägg till</h2></div><button type="button" class="ghost" data-close="resourceDialog">✕</button></div>
+  <input id="resourceId" type="hidden"><label>Namn<input id="resourceName" maxlength="40" required placeholder="Till exempel Båt"></label>
+  <div class="color-row"><label>Ikon eller emoji<input id="resourceIcon" maxlength="4" value="📅"></label><label>Färg<input id="resourceColor" type="color" value="#155e4b"></label></div>
+  <label>Beskrivning<textarea id="resourceDescription" rows="2" placeholder="Valfritt"></textarea></label><p id="resourceError" class="error"></p><button class="primary" type="submit">Spara objekt</button>
+</form></dialog>
+
+<script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
-import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
-import { getFirestore, collection, doc, onSnapshot, runTransaction, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+import { getAuth,onAuthStateChanged,signInWithEmailAndPassword,signOut } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
+import { getFirestore,collection,doc,getDoc,setDoc,onSnapshot,runTransaction,serverTimestamp,deleteDoc,writeBatch } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
-const firebaseConfig={apiKey:"AIzaSyBeucnfeFb9awrRv8ziTmQZxBpMWF4OhpY",authDomain:"bokningar-deb17.firebaseapp.com",projectId:"bokningar-deb17",storageBucket:"bokningar-deb17.firebasestorage.app",messagingSenderId:"964863988500",appId:"1:964863988500:web:fe26f729eb390dcf676801"};
+const firebaseConfig={apiKey:"AIzaSyBeucnfeFb9awrRv8ziTmQZxBpMWF4OhpY",authDomain:"bokningar-deb17.firebaseapp.com",projectId:"bokningar-deb17",storageBucket:"bokningar-deb17.firebasestorage.app",messagingSenderId:"964863988500",appId:"1:964863988500:web:fe26f729eb390dcf676801",measurementId:"G-BH8Z38DDD9"};
 const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app);
-const $=id=>document.getElementById(id);let user=null,bookings=[],currentResource="Bilbokning",viewDate=new Date(),unsubscribe=null;
-const loginView=$("loginView"),appView=$("appView");
-function iso(d){const x=new Date(d);x.setMinutes(x.getMinutes()-x.getTimezoneOffset());return x.toISOString().slice(0,10)}
-function dates(a,b){let r=[],d=new Date(a+"T12:00:00"),e=new Date(b+"T12:00:00");while(d<=e){r.push(iso(d));d.setDate(d.getDate()+1)}return r}
-function fmt(s){return new Date(s+"T12:00:00").toLocaleDateString("sv-SE",{day:"numeric",month:"short",year:"numeric"})}
-function esc(t=""){return String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function errText(e){let c=e?.code||"";if(c.includes("invalid-credential"))return"Fel e-postadress eller lösenord.";if(c.includes("unauthorized-domain"))return"Netlify-adressen måste godkännas i Firebase.";if(c.includes("permission-denied"))return"Firestore-reglerna behöver publiceras.";if(c.includes("network"))return"Kontrollera internetanslutningen.";return e?.message||"Något gick fel."}
+const ADMIN_EMAILS=["barabajen@gmail.com"];
+const DEFAULT_RESOURCES=[
+  {id:"bil",name:"Bil",icon:"🚗",color:"#176b57",description:"Familjens bil",order:1,active:true},
+  {id:"gotland",name:"Gotland",icon:"🏝️",color:"#2879a9",description:"Boendet på Gotland",order:2,active:true},
+  {id:"backora",name:"Bäcköra",icon:"🏡",color:"#9b6a2f",description:"Bäcköra",order:3,active:true}
+];
+const $=id=>document.getElementById(id);
+let user=null,profile=null,resources=[],bookings=[],currentResourceId=null,viewDate=new Date(),unsubs=[];
+const isAdmin=()=>ADMIN_EMAILS.includes((user?.email||"").toLowerCase());
+const iso=d=>{let x=new Date(d);x.setMinutes(x.getMinutes()-x.getTimezoneOffset());return x.toISOString().slice(0,10)};
+const dates=(a,b)=>{let r=[],d=new Date(a+"T12:00:00"),e=new Date(b+"T12:00:00");while(d<=e){r.push(iso(d));d.setDate(d.getDate()+1)}return r};
+const fmt=s=>new Date(s+"T12:00:00").toLocaleDateString("sv-SE",{day:"numeric",month:"short",year:"numeric"});
+const esc=(t="")=>String(t).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const slug=s=>(s||"resurs").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,35)||"resurs";
+function errText(e){const c=e?.code||"";if(c.includes("invalid-credential"))return"Fel e-postadress eller lösenord.";if(c.includes("permission-denied"))return"Du saknar behörighet för detta.";if(c.includes("network"))return"Kontrollera internetanslutningen.";return e?.message||"Något gick fel."}
+function resourceById(id){return resources.find(r=>r.id===id)}
+function displayNameFor(b){if(b.userId===user?.uid)return profile?.displayName||"Christin";return b.displayName||b.userEmail||"Familjemedlem"}
 $("loginForm").onsubmit=async e=>{e.preventDefault();$("loginError").textContent="Loggar in…";try{await signInWithEmailAndPassword(auth,$("emailInput").value.trim(),$("passwordInput").value);$("loginError").textContent=""}catch(x){$("loginError").textContent=errText(x)}};
 $("logoutBtn").onclick=()=>signOut(auth);
-onAuthStateChanged(auth,u=>{user=u;loginView.classList.toggle("hidden",!!u);appView.classList.toggle("hidden",!u);if(!u){unsubscribe?.();return}$("welcomeName").textContent=u.email;$("settingsUser").textContent=u.email;listen();switchTab("Hem")});
-function listen(){unsubscribe?.();$("syncStatus").textContent="Synkroniserar…";unsubscribe=onSnapshot(collection(db,"bookings"),snap=>{bookings=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(a.start||"").localeCompare(b.start||""));$("syncStatus").textContent="Synkroniserad";renderAll()},e=>$("syncStatus").textContent="Fel: "+errText(e))}
-document.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>switchTab(b.dataset.tab));document.querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>switchTab(b.dataset.open));
-function switchTab(n){document.querySelectorAll(".bottom-nav button").forEach(b=>b.classList.toggle("active",b.dataset.tab===n));document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));$("pageTitle").textContent=n;if(n==="Hem")$("homeTab").classList.add("active");else if(n==="Inställningar")$("settingsTab").classList.add("active");else{currentResource=n;$("resourceTitle").textContent=n;$("resourceTab").classList.add("active")}renderAll()}
-function card(b){let mine=b.userId===user?.uid;return`<article class="booking"><div><h4>${esc(b.resource)}</h4><p>${fmt(b.start)} – ${fmt(b.end)}</p><p>${esc(b.userEmail||"Familjemedlem")}${b.comment?" · "+esc(b.comment):""}</p></div>${mine?`<button data-delete="${b.id}">Ta bort</button>`:""}</article>`}
-function bind(){document.querySelectorAll("[data-delete]").forEach(x=>x.onclick=()=>remove(x.dataset.delete))}
-function renderAll(){if(!user)return;let today=iso(new Date()),up=bookings.filter(b=>b.end>=today).slice(0,10),rb=bookings.filter(b=>b.resource===currentResource);$("upcomingList").innerHTML=up.length?up.map(card).join(""):'<div class="card muted">Inga kommande bokningar.</div>';$("resourceBookings").innerHTML=rb.length?rb.map(card).join(""):'<div class="card muted">Inga bokningar för denna flik.</div>';bind();renderCalendar()}
-function renderCalendar(){let y=viewDate.getFullYear(),m=viewDate.getMonth(),off=(new Date(y,m,1).getDay()+6)%7,n=new Date(y,m+1,0).getDate(),today=iso(new Date()),h="";$("monthLabel").textContent=viewDate.toLocaleDateString("sv-SE",{month:"long",year:"numeric"});for(let i=0;i<off;i++)h+='<div class="day empty"></div>';for(let d=1;d<=n;d++){let dt=iso(new Date(y,m,d,12)),b=bookings.find(x=>x.resource===currentResource&&dt>=x.start&&dt<=x.end);h+=`<div class="day ${b?"booked":""} ${dt===today?"today":""}"><strong>${d}</strong>${b?`<small>${esc(b.userEmail||"Bokad")}</small>`:""}</div>`}$("calendarGrid").innerHTML=h}
-$("prevMonth").onclick=()=>{viewDate=new Date(viewDate.getFullYear(),viewDate.getMonth()-1,1);renderCalendar()};$("nextMonth").onclick=()=>{viewDate=new Date(viewDate.getFullYear(),viewDate.getMonth()+1,1);renderCalendar()};
-$("newBookingBtn").onclick=()=>{$("bookingForm").reset();$("dialogResource").textContent=currentResource;$("formError").textContent="";let t=iso(new Date());$("startDate").min=t;$("endDate").min=t;$("bookingDialog").showModal()};$("closeDialog").onclick=()=>$("bookingDialog").close();$("startDate").onchange=()=>$("endDate").min=$("startDate").value;
-$("bookingForm").onsubmit=async e=>{e.preventDefault();let start=$("startDate").value,end=$("endDate").value,comment=$("comment").value.trim();if(!start||!end||end<start){$("formError").textContent="Kontrollera datumen.";return}$("formError").textContent="Sparar…";let br=doc(collection(db,"bookings")),ds=dates(start,end);try{await runTransaction(db,async tx=>{let refs=ds.map(d=>doc(db,"bookingLocks",`${currentResource}__${d}`)),sn=[];for(let r of refs)sn.push(await tx.get(r));if(sn.some(x=>x.exists()))throw Error("DUBBEL");tx.set(br,{resource:currentResource,start,end,comment,userId:user.uid,userEmail:user.email,createdAt:serverTimestamp()});refs.forEach((r,i)=>tx.set(r,{bookingId:br.id,resource:currentResource,date:ds[i],userId:user.uid}))});$("bookingDialog").close()}catch(x){$("formError").textContent=x.message==="DUBBEL"?"Något av datumen är redan bokat.":errText(x)}};
-async function remove(id){let b=bookings.find(x=>x.id===id);if(!b||b.userId!==user.uid||!confirm("Vill du ta bort bokningen?"))return;try{await runTransaction(db,async tx=>{tx.delete(doc(db,"bookings",id));dates(b.start,b.end).forEach(d=>tx.delete(doc(db,"bookingLocks",`${b.resource}__${d}`)))})}catch(x){alert(errText(x))}}
+onAuthStateChanged(auth,async u=>{
+  user=u;$("loginView").classList.toggle("hidden",!!u);$("appView").classList.toggle("hidden",!u);unsubs.forEach(f=>f());unsubs=[];
+  if(!u)return;
+  $("settingsUser").textContent=u.email;
+  await loadProfile();
+  listenData();
+  showTab("home");
+});
+async function loadProfile(){
+  const ref=doc(db,"profiles",user.uid),snap=await getDoc(ref);
+  if(snap.exists())profile=snap.data();else{
+    profile={displayName:isAdmin()?"Christin":(user.email?.split("@")[0]||"Familjemedlem"),email:user.email,updatedAt:serverTimestamp()};
+    try{await setDoc(ref,profile)}catch{}
+  }
+  $("welcomeName").textContent=profile.displayName||"Christin";$("displayNameInput").value=profile.displayName||"";
+}
+function listenData(){
+  $("syncStatus").textContent="Synkroniserar…";
+  unsubs.push(onSnapshot(collection(db,"resources"),async snap=>{
+    resources=snap.docs.map(d=>({id:d.id,...d.data()})).filter(r=>r.active!==false).sort((a,b)=>(a.order||99)-(b.order||99));
+    if(!resources.length&&isAdmin()){const batch=writeBatch(db);DEFAULT_RESOURCES.forEach(r=>batch.set(doc(db,"resources",r.id),{...r,createdAt:serverTimestamp(),createdBy:user.uid}));await batch.commit();return}
+    if(!currentResourceId&&resources.length)currentResourceId=resources[0].id;
+    renderAll();
+  },e=>$("syncStatus").textContent="Fel: "+errText(e)));
+  unsubs.push(onSnapshot(collection(db,"bookings"),snap=>{
+    bookings=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(a.start||"").localeCompare(b.start||""));
+    $("syncStatus").textContent="Synkroniserad";renderAll();
+  },e=>$("syncStatus").textContent="Fel: "+errText(e)));
+}
+document.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>showTab(b.dataset.tab));
+function showTab(name){
+  document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));document.querySelectorAll(".bottom-nav button").forEach(x=>x.classList.toggle("active",x.dataset.tab===name));
+  if(name==="home"){$("homeTab").classList.add("active");$("pageTitle").textContent="Översikt"}
+  if(name==="calendar"){$("resourceTab").classList.add("active");$("pageTitle").textContent="Kalender"}
+  if(name==="settings"){$("settingsTab").classList.add("active");$("pageTitle").textContent="Inställningar"}
+  renderAll();
+}
+function resourceCard(r){
+  const today=iso(new Date()),next=bookings.filter(b=>b.resourceId===r.id&&b.end>=today)[0];
+  const line=next?`${fmt(next.start)}–${fmt(next.end)} · ${esc(displayNameFor(next))}`:"Ledig – inga kommande bokningar";
+  return `<article class="card resource-card" style="--accent:${esc(r.color||"#155e4b")}"><div><div class="resource-icon">${esc(r.icon||"📅")}</div><h3>${esc(r.name)}</h3><p class="muted">${esc(r.description||"")}</p><p class="status">${line}</p></div><div class="resource-actions"><button class="ghost" data-open-cal="${r.id}">Kalender</button><button class="primary" data-book="${r.id}">Boka</button></div></article>`;
+}
+function bookingCard(b){
+  const r=resourceById(b.resourceId)||{name:b.resource||"Bokning",color:"#155e4b"};
+  const mine=b.userId===user?.uid;
+  return `<article class="card booking" style="border-left-color:${esc(r.color||"#155e4b")}"><div><h4>${esc(r.icon||"")} ${esc(r.name)}</h4><p>${fmt(b.start)} – ${fmt(b.end)}</p><p>Bokad av ${esc(displayNameFor(b))}${b.comment?" · "+esc(b.comment):""}</p></div>${mine||isAdmin()?`<button class="danger" data-delete="${b.id}">Ta bort</button>`:""}</article>`;
+}
+function renderAll(){
+  if(!user)return;
+  document.querySelectorAll(".admin-only").forEach(x=>x.classList.toggle("hidden",!isAdmin()));$("adminSection").classList.toggle("hidden",!isAdmin());
+  $("resourceGrid").innerHTML=resources.length?resources.map(resourceCard).join(""):'<div class="card" style="padding:18px">Inga bokningsobjekt ännu.</div>';
+  const today=iso(new Date()),up=bookings.filter(b=>b.end>=today).slice(0,12);$("upcomingList").innerHTML=up.length?up.map(bookingCard).join(""):'<div class="card muted" style="padding:18px">Inga kommande bokningar.</div>';
+  if(currentResourceId&&!resourceById(currentResourceId)&&resources.length)currentResourceId=resources[0].id;
+  const r=resourceById(currentResourceId);$("resourceTitle").textContent=r?`${r.icon||"📅"} ${r.name}`:"Kalender";
+  $("resourcePills").innerHTML=resources.map(x=>`<button class="pill ${x.id===currentResourceId?"active":""}" data-resource="${x.id}">${esc(x.icon||"📅")} ${esc(x.name)}</button>`).join("");
+  const rb=bookings.filter(b=>b.resourceId===currentResourceId);$("resourceBookings").innerHTML=rb.length?rb.map(bookingCard).join(""):'<div class="card muted" style="padding:18px">Inga bokningar för detta objekt.</div>';
+  $("resourceAdminList").innerHTML=resources.map(x=>`<div class="card admin-row"><div><strong>${esc(x.icon||"📅")} ${esc(x.name)}</strong><div class="muted">${esc(x.description||"")}</div></div><div><button class="ghost" data-edit-resource="${x.id}">Ändra</button> <button class="danger" data-remove-resource="${x.id}">Arkivera</button></div></div>`).join("");
+  bindActions();renderCalendar();
+}
+function bindActions(){
+  document.querySelectorAll("[data-open-cal]").forEach(x=>x.onclick=()=>{currentResourceId=x.dataset.openCal;showTab("calendar")});
+  document.querySelectorAll("[data-book]").forEach(x=>x.onclick=()=>openBooking(x.dataset.book));
+  document.querySelectorAll("[data-resource]").forEach(x=>x.onclick=()=>{currentResourceId=x.dataset.resource;renderAll()});
+  document.querySelectorAll("[data-delete]").forEach(x=>x.onclick=()=>removeBooking(x.dataset.delete));
+  document.querySelectorAll("[data-edit-resource]").forEach(x=>x.onclick=()=>openResourceDialog(x.dataset.editResource));
+  document.querySelectorAll("[data-remove-resource]").forEach(x=>x.onclick=()=>archiveResource(x.dataset.removeResource));
+}
+function renderCalendar(){
+  const y=viewDate.getFullYear(),m=viewDate.getMonth(),off=(new Date(y,m,1).getDay()+6)%7,n=new Date(y,m+1,0).getDate(),today=iso(new Date());
+  $("monthLabel").textContent=viewDate.toLocaleDateString("sv-SE",{month:"long",year:"numeric"});let h="";
+  for(let i=0;i<off;i++)h+='<div class="day empty"></div>';
+  for(let d=1;d<=n;d++){const dt=iso(new Date(y,m,d,12)),b=bookings.find(x=>x.resourceId===currentResourceId&&dt>=x.start&&dt<=x.end),mine=b?.userId===user?.uid;
+    h+=`<div class="day ${b?"busy":""} ${mine?"mine":""} ${dt===today?"today":""}"><strong>${d}</strong>${b?`<small>${esc(displayNameFor(b))}</small>`:""}<button aria-label="${b?"Bokad "+displayNameFor(b):"Boka "+dt}" data-day="${dt}"></button></div>`;
+  }
+  $("calendarGrid").innerHTML=h;document.querySelectorAll("[data-day]").forEach(x=>x.onclick=()=>{const dt=x.dataset.day,b=bookings.find(v=>v.resourceId===currentResourceId&&dt>=v.start&&dt<=v.end);if(b)alert(`${displayNameFor(b)} har bokat ${fmt(b.start)}–${fmt(b.end)}${b.comment?`\n${b.comment}`:""}`);else openBooking(currentResourceId,dt)});
+}
+$("prevMonth").onclick=()=>{viewDate=new Date(viewDate.getFullYear(),viewDate.getMonth()-1,1);renderCalendar()};
+$("nextMonth").onclick=()=>{viewDate=new Date(viewDate.getFullYear(),viewDate.getMonth()+1,1);renderCalendar()};
+$("newBookingBtn").onclick=()=>openBooking(currentResourceId);$("quickBookBtn").onclick=()=>openBooking(currentResourceId||resources[0]?.id);
+function openBooking(resourceId,day=""){currentResourceId=resourceId||currentResourceId;const r=resourceById(currentResourceId);if(!r)return alert("Lägg först till ett bokningsobjekt.");$("bookingForm").reset();$("dialogResource").textContent=`${r.icon||"📅"} ${r.name}`;$("formError").textContent="";const t=iso(new Date()),chosen=day||t;$("startDate").min=t;$("endDate").min=t;$("startDate").value=chosen;$("endDate").value=chosen;$("bookingDialog").showModal()}
+$("startDate").onchange=()=>{$("endDate").min=$("startDate").value;if(!$("endDate").value||$("endDate").value<$("startDate").value)$("endDate").value=$("startDate").value};
+$("bookingForm").onsubmit=async e=>{
+  e.preventDefault();const start=$("startDate").value,end=$("endDate").value,comment=$("comment").value.trim(),r=resourceById(currentResourceId);
+  if(!start||!end||end<start){$("formError").textContent="Kontrollera datumen.";return}
+  $("formError").textContent="Sparar…";const bookingRef=doc(collection(db,"bookings")),ds=dates(start,end);
+  try{await runTransaction(db,async tx=>{
+    const refs=ds.map(d=>doc(db,"bookingLocks",`${currentResourceId}__${d}`));const snaps=[];
+    for(const ref of refs)snaps.push(await tx.get(ref));if(snaps.some(s=>s.exists()))throw new Error("DUBBEL");
+    tx.set(bookingRef,{resourceId:currentResourceId,resource:r.name,start,end,comment,userId:user.uid,userEmail:user.email,displayName:profile?.displayName||"Christin",createdAt:serverTimestamp()});
+    refs.forEach((ref,i)=>tx.set(ref,{bookingId:bookingRef.id,resourceId:currentResourceId,date:ds[i],userId:user.uid}));
+  });$("bookingDialog").close()}catch(x){$("formError").textContent=x.message==="DUBBEL"?"Något av datumen är redan bokat.":errText(x)}
+};
+async function removeBooking(id){
+  const b=bookings.find(x=>x.id===id);if(!b||(!isAdmin()&&b.userId!==user.uid)||!confirm("Vill du ta bort bokningen?"))return;
+  try{await runTransaction(db,async tx=>{
+    const lockRefs=dates(b.start,b.end).map(d=>doc(db,"bookingLocks",`${b.resourceId||slug(b.resource)}__${d}`));const snaps=[];
+    for(const ref of lockRefs)snaps.push(await tx.get(ref));tx.delete(doc(db,"bookings",id));
+    snaps.forEach((s,i)=>{if(s.exists()&&s.data().bookingId===id)tx.delete(lockRefs[i])});
+  })}catch(x){alert(errText(x))}
+}
+$("profileForm").onsubmit=async e=>{e.preventDefault();const name=$("displayNameInput").value.trim();if(!name)return;try{await setDoc(doc(db,"profiles",user.uid),{displayName:name,email:user.email,updatedAt:serverTimestamp()},{merge:true});profile={...profile,displayName:name};$("welcomeName").textContent=name;$("profileMsg").textContent="Sparat.";renderAll()}catch(x){$("profileMsg").textContent=errText(x)}};
+$("addResourceBtn").onclick=()=>openResourceDialog();$("addResourceTop").onclick=()=>openResourceDialog();
+function openResourceDialog(id=""){
+  if(!isAdmin())return;const r=resourceById(id);$("resourceForm").reset();$("resourceId").value=id;$("resourceDialogTitle").textContent=r?"Ändra objekt":"Lägg till objekt";$("resourceName").value=r?.name||"";$("resourceIcon").value=r?.icon||"📅";$("resourceColor").value=r?.color||"#155e4b";$("resourceDescription").value=r?.description||"";$("resourceError").textContent="";$("resourceDialog").showModal()
+}
+$("resourceForm").onsubmit=async e=>{e.preventDefault();if(!isAdmin())return;const existing=$("resourceId").value,name=$("resourceName").value.trim(),id=existing||slug(name);try{await setDoc(doc(db,"resources",id),{name,icon:$("resourceIcon").value.trim()||"📅",color:$("resourceColor").value,description:$("resourceDescription").value.trim(),active:true,order:resourceById(existing)?.order||resources.length+1,updatedAt:serverTimestamp(),updatedBy:user.uid},{merge:true});$("resourceDialog").close()}catch(x){$("resourceError").textContent=errText(x)}};
+async function archiveResource(id){if(!isAdmin()||!confirm("Vill du arkivera detta bokningsobjekt? Befintliga bokningar sparas."))return;try{await setDoc(doc(db,"resources",id),{active:false,updatedAt:serverTimestamp()},{merge:true})}catch(x){alert(errText(x))}}
+document.querySelectorAll("[data-close]").forEach(x=>x.onclick=() => $(x.dataset.close).close());
+if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
 </script>
 </body>
 </html>
