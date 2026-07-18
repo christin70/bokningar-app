@@ -183,7 +183,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/fireba
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
 import { getFirestore, collection, doc, onSnapshot, runTransaction, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
-const firebaseConfig={apiKey:"AIzaSyBeucnfeFb9awrRv8ziTmQZxBpMWF40hpY",authDomain:"bokningar-deb17.firebaseapp.com",projectId:"bokningar-deb17",storageBucket:"bokningar-deb17.firebasestorage.app",messagingSenderId:"964863988500",appId:"1:964863988500:web:fe26f729eb390dcf676801"};
+const firebaseConfig={apiKey:"AIzaSyBeucnfeFb9awrRv8ziTmQZxBpMWF4OhpY",authDomain:"bokningar-deb17.firebaseapp.com",projectId:"bokningar-deb17",storageBucket:"bokningar-deb17.firebasestorage.app",messagingSenderId:"964863988500",appId:"1:964863988500:web:fe26f729eb390dcf676801"};
 const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app);
 const $=id=>document.getElementById(id);let user=null,bookings=[],currentResource="Bilbokning",viewDate=new Date(),unsubscribe=null;
 const loginView=$("loginView"),appView=$("appView");
