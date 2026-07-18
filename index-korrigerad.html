@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#175c4d" />
+  <title>Bokningar</title>
+  <style>
+
+:root {
+  --bg: #f4f7f5;
+  --card: #ffffff;
+  --text: #17332c;
+  --muted: #6e7d78;
+  --brand: #175c4d;
+  --brand-soft: #dff0e9;
+  --danger: #a93333;
+  --border: #dce5e1;
+  --shadow: 0 10px 30px rgba(23, 51, 44, .08);
+}
+* { box-sizing: border-box; }
+body { margin: 0; font-family: Inter, ui-sans-serif, system-ui, -apple-system, Arial; background: var(--bg); color: var(--text); }
+button, input, select, textarea { font: inherit; }
+button { cursor: pointer; }
+.screen { min-height: 100dvh; }
+.hidden { display: none !important; }
+.centered { display: grid; place-items: center; padding: 24px; }
+.card { background: var(--card); border: 1px solid var(--border); border-radius: 22px; box-shadow: var(--shadow); padding: 20px; }
+.login-card { width: min(420px, 100%); text-align: center; }
+.logo { width: 64px; height: 64px; border-radius: 18px; display: grid; place-items: center; margin: 0 auto 12px; background: var(--brand); color: white; font-weight: 800; font-size: 30px; }
+h1, h2, h3, p { margin-top: 0; }
+.muted { color: var(--muted); }
+.eyebrow { margin-bottom: 4px; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+label { display: grid; gap: 7px; text-align: left; margin: 14px 0; font-weight: 650; }
+input, select, textarea { width: 100%; border: 1px solid var(--border); border-radius: 13px; padding: 13px; background: white; color: var(--text); }
+.primary, .ghost, .danger { border: 0; border-radius: 13px; padding: 12px 15px; font-weight: 750; }
+.primary { background: var(--brand); color: white; }
+.ghost { background: var(--brand-soft); color: var(--brand); }
+.danger { background: #f9e4e4; color: var(--danger); }
+.login-card .primary { width: 100%; }
+.topbar { position: sticky; top: 0; z-index: 5; display: flex; justify-content: space-between; align-items: center; padding: 16px 18px; background: rgba(244,247,245,.94); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); }
+.topbar h1 { margin: 0; font-size: 24px; }
+main { max-width: 900px; margin: 0 auto; padding: 18px 16px 105px; }
+.tab { display: none; }
+.tab.active { display: block; }
+.hero, .resource-header { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 22px; }
+.booking-list { display: grid; gap: 12px; }
+.booking { display: flex; justify-content: space-between; align-items: center; gap: 14px; background: var(--card); border: 1px solid var(--border); border-left: 6px solid var(--brand); border-radius: 16px; padding: 15px; }
+.booking h4 { margin: 0 0 5px; }
+.booking p { margin: 0; color: var(--muted); font-size: 14px; }
+.booking button { border: 0; background: #f9e4e4; color: var(--danger); border-radius: 10px; padding: 9px; }
+.month-nav { display: flex; align-items: center; justify-content: space-between; }
+.month-nav h3 { margin: 0; text-transform: capitalize; }
+.weekdays, .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+.weekdays { margin: 18px 0 8px; color: var(--muted); font-size: 12px; text-align: center; }
+.day { min-height: 58px; border-radius: 12px; padding: 7px; border: 1px solid var(--border); background: #fbfdfc; font-size: 13px; }
+.day.empty { border-color: transparent; background: transparent; }
+.day.booked { background: #f7dddd; border-color: #efbcbc; }
+.day.today { outline: 2px solid var(--brand); }
+.day small { display: block; margin-top: 5px; color: var(--danger); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bottom-nav { position: fixed; left: 0; right: 0; bottom: 0; z-index: 10; display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; padding: 8px 8px calc(8px + env(safe-area-inset-bottom)); background: white; border-top: 1px solid var(--border); }
+.bottom-nav button { display: grid; place-items: center; gap: 3px; border: 0; border-radius: 12px; background: transparent; color: var(--muted); padding: 8px 2px; font-size: 18px; }
+.bottom-nav button span { font-size: 10px; }
+.bottom-nav button.active { background: var(--brand-soft); color: var(--brand); }
+dialog { width: min(480px, calc(100% - 24px)); border: 0; border-radius: 22px; padding: 0; box-shadow: 0 25px 80px rgba(0,0,0,.25); }
+dialog::backdrop { background: rgba(7,24,20,.55); backdrop-filter: blur(3px); }
+dialog form { padding: 22px; }
+.dialog-head { display: flex; justify-content: space-between; align-items: start; }
+.error { color: var(--danger); min-height: 20px; font-size: 14px; }
+@media (max-width: 600px) {
+  .hero { align-items: stretch; flex-direction: column; }
+  .resource-header { align-items: center; }
+  .day { min-height: 47px; padding: 5px; }
+  .day small { display: none; }
+}
+
+</style>
+</head>
+<body>
+  <div id="loginView" class="screen centered">
+    <section class="card login-card">
+      <div class="logo">B</div>
+      <h1>Bokningar</h1>
+      <p class="muted">Familjens gemensamma bokningsapp</p>
+      <form id="loginForm">
+<label>E-postadress<input id="emailInput" type="email" autocomplete="username" required></label>
+<label>Lösenord<input id="passwordInput" type="password" autocomplete="current-password" required></label>
+<p id="loginError" class="error"></p>
+<button type="submit" class="primary">Logga in</button>
+</form>
+    </section>
+  </div>
+
+  <div id="appView" class="screen hidden">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">Bokningar.app</p>
+        <h1 id="pageTitle">Hem</h1><small id="syncStatus" class="muted">Ansluter…</small>
+      </div>
+      <button id="logoutBtn" class="ghost">Logga ut</button>
+    </header>
+
+    <main>
+      <section id="homeTab" class="tab active">
+        <div class="hero card">
+          <div>
+            <p class="eyebrow">Välkommen</p>
+            <h2 id="welcomeName"></h2>
+            <p class="muted">Här ser du familjens kommande bokningar.</p>
+          </div>
+          <button class="primary" data-open="Bilbokning">+ Ny bokning</button>
+        </div>
+        <h3>Kommande bokningar</h3>
+        <div id="upcomingList" class="booking-list"></div>
+      </section>
+
+      <section id="resourceTab" class="tab">
+        <div class="resource-header card">
+          <div>
+            <p class="eyebrow">Kalender</p>
+            <h2 id="resourceTitle">Bilbokning</h2>
+          </div>
+          <button id="newBookingBtn" class="primary">+ Boka</button>
+        </div>
+        <div class="card">
+          <div class="month-nav">
+            <button id="prevMonth" class="ghost">‹</button>
+            <h3 id="monthLabel"></h3>
+            <button id="nextMonth" class="ghost">›</button>
+          </div>
+          <div class="weekdays">
+            <span>Mån</span><span>Tis</span><span>Ons</span><span>Tor</span><span>Fre</span><span>Lör</span><span>Sön</span>
+          </div>
+          <div id="calendarGrid" class="calendar-grid"></div>
+        </div>
+        <h3>Bokningar</h3>
+        <div id="resourceBookings" class="booking-list"></div>
+      </section>
+
+      <section id="settingsTab" class="tab">
+        <div class="card">
+          <h2>Inställningar</h2>
+          <p>Inloggad som <strong id="settingsUser"></strong>.</p>
+          <p class="muted">Bokningarna sparas gemensamt i Firebase och uppdateras i realtid.</p>
+        </div>
+      </section>
+    </main>
+
+    <nav class="bottom-nav">
+      <button data-tab="Hem" class="active">⌂<span>Hem</span></button>
+      <button data-tab="Bilbokning">🚗<span>Bilbokning</span></button>
+      <button data-tab="Gotland">🏝️<span>Gotland</span></button>
+      <button data-tab="Bäcköra">🏡<span>Bäcköra</span></button>
+      <button data-tab="Inställningar">⚙️<span>Inställningar</span></button>
+    </nav>
+  </div>
+
+  <dialog id="bookingDialog">
+    <form id="bookingForm" method="dialog">
+      <div class="dialog-head">
+        <div>
+          <p class="eyebrow">Ny bokning</p>
+          <h2 id="dialogResource">Bilbokning</h2>
+        </div>
+        <button type="button" id="closeDialog" class="ghost">✕</button>
+      </div>
+      <label>Från
+        <input id="startDate" type="date" required />
+      </label>
+      <label>Till
+        <input id="endDate" type="date" required />
+      </label>
+      <label>Kommentar
+        <textarea id="comment" rows="3" placeholder="Valfritt"></textarea>
+      </label>
+      <p id="formError" class="error"></p>
+      <button type="submit" class="primary">Spara bokning</button>
+    </form>
+  </dialog>
+
+  <script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
+import { getFirestore, collection, doc, onSnapshot, runTransaction, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+
+const firebaseConfig={apiKey:"AIzaSyBeucnfeFb9awrRv8ziTmQZxBpMWF4OhpY",authDomain:"bokningar-deb17.firebaseapp.com",projectId:"bokningar-deb17",storageBucket:"bokningar-deb17.firebasestorage.app",messagingSenderId:"964863988500",appId:"1:964863988500:web:fe26f729eb390dcf676801"};
+const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app);
+const $=id=>document.getElementById(id);let user=null,bookings=[],currentResource="Bilbokning",viewDate=new Date(),unsubscribe=null;
+const loginView=$("loginView"),appView=$("appView");
+function iso(d){const x=new Date(d);x.setMinutes(x.getMinutes()-x.getTimezoneOffset());return x.toISOString().slice(0,10)}
+function dates(a,b){let r=[],d=new Date(a+"T12:00:00"),e=new Date(b+"T12:00:00");while(d<=e){r.push(iso(d));d.setDate(d.getDate()+1)}return r}
+function fmt(s){return new Date(s+"T12:00:00").toLocaleDateString("sv-SE",{day:"numeric",month:"short",year:"numeric"})}
+function esc(t=""){return String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function errText(e){let c=e?.code||"";if(c.includes("invalid-credential"))return"Fel e-postadress eller lösenord.";if(c.includes("unauthorized-domain"))return"Netlify-adressen måste godkännas i Firebase.";if(c.includes("permission-denied"))return"Firestore-reglerna behöver publiceras.";if(c.includes("network"))return"Kontrollera internetanslutningen.";return e?.message||"Något gick fel."}
+$("loginForm").onsubmit=async e=>{e.preventDefault();$("loginError").textContent="Loggar in…";try{await signInWithEmailAndPassword(auth,$("emailInput").value.trim(),$("passwordInput").value);$("loginError").textContent=""}catch(x){$("loginError").textContent=errText(x)}};
+$("logoutBtn").onclick=()=>signOut(auth);
+onAuthStateChanged(auth,u=>{user=u;loginView.classList.toggle("hidden",!!u);appView.classList.toggle("hidden",!u);if(!u){unsubscribe?.();return}$("welcomeName").textContent=u.email;$("settingsUser").textContent=u.email;listen();switchTab("Hem")});
+function listen(){unsubscribe?.();$("syncStatus").textContent="Synkroniserar…";unsubscribe=onSnapshot(collection(db,"bookings"),snap=>{bookings=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(a.start||"").localeCompare(b.start||""));$("syncStatus").textContent="Synkroniserad";renderAll()},e=>$("syncStatus").textContent="Fel: "+errText(e))}
+document.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>switchTab(b.dataset.tab));document.querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>switchTab(b.dataset.open));
+function switchTab(n){document.querySelectorAll(".bottom-nav button").forEach(b=>b.classList.toggle("active",b.dataset.tab===n));document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));$("pageTitle").textContent=n;if(n==="Hem")$("homeTab").classList.add("active");else if(n==="Inställningar")$("settingsTab").classList.add("active");else{currentResource=n;$("resourceTitle").textContent=n;$("resourceTab").classList.add("active")}renderAll()}
+function card(b){let mine=b.userId===user?.uid;return`<article class="booking"><div><h4>${esc(b.resource)}</h4><p>${fmt(b.start)} – ${fmt(b.end)}</p><p>${esc(b.userEmail||"Familjemedlem")}${b.comment?" · "+esc(b.comment):""}</p></div>${mine?`<button data-delete="${b.id}">Ta bort</button>`:""}</article>`}
+function bind(){document.querySelectorAll("[data-delete]").forEach(x=>x.onclick=()=>remove(x.dataset.delete))}
+function renderAll(){if(!user)return;let today=iso(new Date()),up=bookings.filter(b=>b.end>=today).slice(0,10),rb=bookings.filter(b=>b.resource===currentResource);$("upcomingList").innerHTML=up.length?up.map(card).join(""):'<div class="card muted">Inga kommande bokningar.</div>';$("resourceBookings").innerHTML=rb.length?rb.map(card).join(""):'<div class="card muted">Inga bokningar för denna flik.</div>';bind();renderCalendar()}
+function renderCalendar(){let y=viewDate.getFullYear(),m=viewDate.getMonth(),off=(new Date(y,m,1).getDay()+6)%7,n=new Date(y,m+1,0).getDate(),today=iso(new Date()),h="";$("monthLabel").textContent=viewDate.toLocaleDateString("sv-SE",{month:"long",year:"numeric"});for(let i=0;i<off;i++)h+='<div class="day empty"></div>';for(let d=1;d<=n;d++){let dt=iso(new Date(y,m,d,12)),b=bookings.find(x=>x.resource===currentResource&&dt>=x.start&&dt<=x.end);h+=`<div class="day ${b?"booked":""} ${dt===today?"today":""}"><strong>${d}</strong>${b?`<small>${esc(b.userEmail||"Bokad")}</small>`:""}</div>`}$("calendarGrid").innerHTML=h}
+$("prevMonth").onclick=()=>{viewDate=new Date(viewDate.getFullYear(),viewDate.getMonth()-1,1);renderCalendar()};$("nextMonth").onclick=()=>{viewDate=new Date(viewDate.getFullYear(),viewDate.getMonth()+1,1);renderCalendar()};
+$("newBookingBtn").onclick=()=>{$("bookingForm").reset();$("dialogResource").textContent=currentResource;$("formError").textContent="";let t=iso(new Date());$("startDate").min=t;$("endDate").min=t;$("bookingDialog").showModal()};$("closeDialog").onclick=()=>$("bookingDialog").close();$("startDate").onchange=()=>$("endDate").min=$("startDate").value;
+$("bookingForm").onsubmit=async e=>{e.preventDefault();let start=$("startDate").value,end=$("endDate").value,comment=$("comment").value.trim();if(!start||!end||end<start){$("formError").textContent="Kontrollera datumen.";return}$("formError").textContent="Sparar…";let br=doc(collection(db,"bookings")),ds=dates(start,end);try{await runTransaction(db,async tx=>{let refs=ds.map(d=>doc(db,"bookingLocks",`${currentResource}__${d}`)),sn=[];for(let r of refs)sn.push(await tx.get(r));if(sn.some(x=>x.exists()))throw Error("DUBBEL");tx.set(br,{resource:currentResource,start,end,comment,userId:user.uid,userEmail:user.email,createdAt:serverTimestamp()});refs.forEach((r,i)=>tx.set(r,{bookingId:br.id,resource:currentResource,date:ds[i],userId:user.uid}))});$("bookingDialog").close()}catch(x){$("formError").textContent=x.message==="DUBBEL"?"Något av datumen är redan bokat.":errText(x)}};
+async function remove(id){let b=bookings.find(x=>x.id===id);if(!b||b.userId!==user.uid||!confirm("Vill du ta bort bokningen?"))return;try{await runTransaction(db,async tx=>{tx.delete(doc(db,"bookings",id));dates(b.start,b.end).forEach(d=>tx.delete(doc(db,"bookingLocks",`${b.resource}__${d}`)))})}catch(x){alert(errText(x))}}
+</script>
+</body>
+</html>
