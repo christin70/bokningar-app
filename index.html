@@ -4,12 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#155e4b">
+  <meta name="version" content="2.1.0">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Bokningar">
-  <link rel="manifest" href="manifest.webmanifest">
+  
   <link rel="icon" href="icon.svg" type="image/svg+xml">
-  <title>Bokningar</title>
+  <title>Bokningar – Version 2.1</title>
   <style>
     :root{
       --bg:#f4f7f5;--card:#fff;--text:#17332c;--muted:#6b7c76;--brand:#155e4b;
@@ -51,7 +52,7 @@
 <body>
 <div id="loginView" class="screen centered">
   <section class="card login-card">
-    <div class="logo">B</div><h1>Bokningar</h1><p class="muted">Familjens gemensamma bokningsapp</p>
+    <div class="logo">B</div><h1>Bokningar</h1><p class="muted">Familjens gemensamma bokningsapp</p><p class="eyebrow">Version 2.1</p>
     <form id="loginForm">
       <label>E-postadress<input id="emailInput" type="email" autocomplete="username" required></label>
       <label>Lösenord<input id="passwordInput" type="password" autocomplete="current-password" required></label>
@@ -62,7 +63,7 @@
 
 <div id="appView" class="screen hidden">
   <header class="topbar"><div class="toprow">
-    <div><p class="eyebrow">Bokningar</p><h1 id="pageTitle">Översikt</h1><small id="syncStatus" class="muted">Ansluter…</small></div>
+    <div><p class="eyebrow">Bokningar</p><h1 id="pageTitle">Översikt</h1><small id="syncStatus" class="muted">Version 2.1 · Ansluter…</small></div>
     <button id="logoutBtn" class="ghost">Logga ut</button>
   </div></header>
   <main>
@@ -241,7 +242,11 @@ function openResourceDialog(id=""){
 $("resourceForm").onsubmit=async e=>{e.preventDefault();if(!isAdmin())return;const existing=$("resourceId").value,name=$("resourceName").value.trim(),id=existing||slug(name);try{await setDoc(doc(db,"resources",id),{name,icon:$("resourceIcon").value.trim()||"📅",color:$("resourceColor").value,description:$("resourceDescription").value.trim(),active:true,order:resourceById(existing)?.order||resources.length+1,updatedAt:serverTimestamp(),updatedBy:user.uid},{merge:true});$("resourceDialog").close()}catch(x){$("resourceError").textContent=errText(x)}};
 async function archiveResource(id){if(!isAdmin()||!confirm("Vill du arkivera detta bokningsobjekt? Befintliga bokningar sparas."))return;try{await setDoc(doc(db,"resources",id),{active:false,updatedAt:serverTimestamp()},{merge:true})}catch(x){alert(errText(x))}}
 document.querySelectorAll("[data-close]").forEach(x=>x.onclick=() => $(x.dataset.close).close());
-if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.getRegistrations()
+    .then(items => items.forEach(item => item.unregister()))
+    .catch(() => {});
+}
 </script>
 </body>
 </html>

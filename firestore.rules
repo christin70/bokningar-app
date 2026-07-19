@@ -7,8 +7,7 @@ service cloud.firestore {
 
     function isAdmin() {
       return signedIn()
-        && request.auth.token.email != null
-        && request.auth.token.email.lower() == "barabajen@gmail.com";
+        && request.auth.token.email == "barabajen@gmail.com";
     }
 
     match /profiles/{userId} {
