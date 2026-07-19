@@ -1,19 +1,32 @@
-BOKNINGAR VERSION 2.2
+BOKNINGAR VERSION 2.3 – AUTOMATISKA UPPDATERINGAR
 
-NYTT
-- Adminpanel under Inställningar.
-- Ändra, Arkivera och Ta bort.
-- Objekt med bokningar kan inte raderas.
-- Arkiverade objekt kan återställas.
-- Bara administratören ser administrationsfunktionerna.
+ENGÅNGSINSTALLATION
+1. Ladda upp de vanliga appfilerna till GitHub:
+   index.html
+   firestore.rules
+   icon.svg
+   _headers
+   README.txt
 
-UPPLADDNING
-1. Öppna GitHub-repot.
-2. Add file > Upload files.
-3. Ladda upp index.html, firestore.rules, icon.svg, _headers och README.txt.
-4. Commit changes.
-5. Vänta på Netlify Published.
-6. Kontrollera att Version 2.2 visas.
+2. Skapa sedan arbetsflödet i GitHub:
+   Add file > Create new file
+   Filnamn: .github/workflows/install-update.yml
+   Klistra in innehållet från filen install-update.yml i detta paket.
+   Klicka Commit changes.
 
-FIREBASE
-Reglerna är samma typ som tidigare, men publicera firestore.rules igen om GitHub-reglerna och Firebase-reglerna inte är identiska.
+EFTER ENGÅNGSINSTALLATIONEN
+1. Ladda ner nästa uppdateringsfil.
+2. Ändra filnamnet till update.zip om det inte redan heter så.
+3. Ladda upp endast update.zip i projektets rot på GitHub.
+4. GitHub packar automatiskt upp uppdateringen och tar bort zip-filen.
+5. Netlify publicerar därefter den nya versionen automatiskt.
+
+KONTROLL
+På GitHub kan du öppna fliken Actions. Körningen
+"Installera Bokningar-uppdatering" ska få en grön markering.
+
+OBS
+GitHub Actions måste få skriva till projektet. Workflow-filen innehåller
+permissions: contents: write. På vissa GitHub-konton kan du dessutom behöva
+gå till Settings > Actions > General > Workflow permissions och välja
+Read and write permissions.

@@ -4,13 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#155e4b">
-  <meta name="version" content="2.2.0">
+  <meta name="version" content="2.3.0">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Bokningar">
   
   <link rel="icon" href="icon.svg" type="image/svg+xml">
-  <title>Bokningar – Version 2.2</title>
+  <title>Bokningar – Version 2.3</title>
   <style>
     :root{
       --bg:#f4f7f5;--card:#fff;--text:#17332c;--muted:#6b7c76;--brand:#155e4b;
@@ -60,7 +60,7 @@
 <body>
 <div id="loginView" class="screen centered">
   <section class="card login-card">
-    <div class="logo">B</div><h1>Bokningar</h1><p class="muted">Familjens gemensamma bokningsapp</p><p class="eyebrow">Version 2.2</p>
+    <div class="logo">B</div><h1>Bokningar</h1><p class="muted">Familjens gemensamma bokningsapp</p><p class="eyebrow">Version 2.3</p>
     <form id="loginForm">
       <label>E-postadress<input id="emailInput" type="email" autocomplete="username" required></label>
       <label>Lösenord<input id="passwordInput" type="password" autocomplete="current-password" required></label>
@@ -71,7 +71,7 @@
 
 <div id="appView" class="screen hidden">
   <header class="topbar"><div class="toprow">
-    <div><p class="eyebrow">Bokningar</p><h1 id="pageTitle">Översikt</h1><small id="syncStatus" class="muted">Version 2.2 · Ansluter…</small></div>
+    <div><p class="eyebrow">Bokningar</p><h1 id="pageTitle">Översikt</h1><small id="syncStatus" class="muted">Version 2.3 · Ansluter…</small></div>
     <button id="logoutBtn" class="ghost">Logga ut</button>
   </div></header>
   <main>
@@ -109,6 +109,11 @@
           <div id="archivedResourceList" class="resource-admin"></div>
         </section>
         <section id="adminInfo" class="admin-panel-section">
+          <div class="card" style="padding:14px;margin-bottom:12px">
+            <h3>🔄 Automatisk uppdatering</h3>
+            <p>När engångsinstallationen är klar kan nästa version installeras genom att ladda upp en enda fil med namnet <strong>update.zip</strong> till GitHub.</p>
+            <p class="muted">GitHub packar upp filen och Netlify publicerar den nya versionen automatiskt.</p>
+          </div>
           <div class="card warning-card">
             <h3>Skillnaden mellan Arkivera och Ta bort</h3>
             <p><strong>Arkivera</strong> gömmer objektet men sparar bokningshistoriken. Det kan återställas.</p>
