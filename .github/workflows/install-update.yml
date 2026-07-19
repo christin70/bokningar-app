@@ -1,1 +1,42 @@
 
+name: Installera Bokningar-uppdatering
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - update.zip
+
+permissions:
+  contents: write
+
+jobs:
+  install-update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Hämta projektet
+        uses: actions/checkout@v4
+
+      - name: Kontrollera uppdateringsfilen
+        run: |
+          test -f update.zip
+          unzip -t update.zip
+
+      - name: Installera uppdateringen
+        run: |
+          unzip -o update.zip -d .
+          rm update.zip
+
+      - name: Spara de installerade filerna
+        run: |
+          git config user.name "Bokningar Updater"
+          git config user.email "actions@github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Inga ändringar att spara."
+          else
+            git commit -m "Installera automatisk Bokningar-uppdatering"
+            git push
+          fi
