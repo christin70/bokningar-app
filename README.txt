@@ -1,17 +1,19 @@
-BOKNINGAR VERSION 2.1
+BOKNINGAR VERSION 2.2
 
-Den här versionen tar bort service worker och cachelagring som kan göra att den gamla sidan visas.
+NYTT
+- Adminpanel under Inställningar.
+- Ändra, Arkivera och Ta bort.
+- Objekt med bokningar kan inte raderas.
+- Arkiverade objekt kan återställas.
+- Bara administratören ser administrationsfunktionerna.
 
-LADDA UPP TILL GITHUB
-1. Add file > Upload files.
-2. Ladda upp index.html, firestore.rules, icon.svg och _headers.
-3. Klicka Commit changes.
-4. Vänta tills Netlify visar Published.
+UPPLADDNING
+1. Öppna GitHub-repot.
+2. Add file > Upload files.
+3. Ladda upp index.html, firestore.rules, icon.svg, _headers och README.txt.
+4. Commit changes.
+5. Vänta på Netlify Published.
+6. Kontrollera att Version 2.2 visas.
 
 FIREBASE
-1. Firestore Database > Rules.
-2. Ersätt reglerna med innehållet i firestore.rules.
-3. Klicka Publish.
-
-KONTROLL
-På inloggningssidan ska det stå Version 2.1.
+Reglerna är samma typ som tidigare, men publicera firestore.rules igen om GitHub-reglerna och Firebase-reglerna inte är identiska.

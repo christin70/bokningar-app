@@ -4,13 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#155e4b">
-  <meta name="version" content="2.1.0">
+  <meta name="version" content="2.2.0">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Bokningar">
   
   <link rel="icon" href="icon.svg" type="image/svg+xml">
-  <title>Bokningar – Version 2.1</title>
+  <title>Bokningar – Version 2.2</title>
   <style>
     :root{
       --bg:#f4f7f5;--card:#fff;--text:#17332c;--muted:#6b7c76;--brand:#155e4b;
@@ -41,6 +41,14 @@
     .day small{display:block;margin-top:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:11px}.booking-list{display:grid;gap:11px;margin-top:12px}
     .booking{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:15px;border-left:6px solid var(--brand)}.booking h4{margin:0 0 4px}.booking p{margin:0;color:var(--muted);font-size:14px}
     .section-head{display:flex;justify-content:space-between;align-items:center;margin:22px 0 10px}.resource-admin{display:grid;gap:10px}.admin-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px}
+    .admin-actions{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:7px}
+    .admin-actions button{padding:9px 11px}
+    .admin-menu{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}
+    .admin-menu button{border:1px solid var(--border);background:#fff;border-radius:16px;padding:14px;font-weight:800;color:var(--text)}
+    .admin-menu button.active{background:var(--soft);color:var(--brand);border-color:var(--brand)}
+    .admin-panel-section{display:none}.admin-panel-section.active{display:block}
+    .warning-card{padding:14px;background:#fff8e3;border-color:#ead89f}
+    @media(max-width:600px){.admin-menu{grid-template-columns:1fr}.admin-row{align-items:flex-start;flex-direction:column}.admin-actions{width:100%;justify-content:flex-start}}
     .bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:20;background:#fff;border-top:1px solid var(--border);display:grid;grid-template-columns:repeat(3,1fr);padding:8px 8px calc(8px + env(safe-area-inset-bottom))}
     .bottom-nav button{border:0;background:transparent;border-radius:13px;padding:8px;color:var(--muted);font-weight:800}.bottom-nav button.active{background:var(--soft);color:var(--brand)}.bottom-nav span{display:block;font-size:10px;margin-top:3px}
     dialog{width:min(500px,calc(100% - 24px));border:0;border-radius:22px;padding:0;box-shadow:0 25px 90px rgba(0,0,0,.27)}dialog::backdrop{background:rgba(5,23,18,.57);backdrop-filter:blur(3px)}
@@ -52,7 +60,7 @@
 <body>
 <div id="loginView" class="screen centered">
   <section class="card login-card">
-    <div class="logo">B</div><h1>Bokningar</h1><p class="muted">Familjens gemensamma bokningsapp</p><p class="eyebrow">Version 2.1</p>
+    <div class="logo">B</div><h1>Bokningar</h1><p class="muted">Familjens gemensamma bokningsapp</p><p class="eyebrow">Version 2.2</p>
     <form id="loginForm">
       <label>E-postadress<input id="emailInput" type="email" autocomplete="username" required></label>
       <label>Lösenord<input id="passwordInput" type="password" autocomplete="current-password" required></label>
@@ -63,7 +71,7 @@
 
 <div id="appView" class="screen hidden">
   <header class="topbar"><div class="toprow">
-    <div><p class="eyebrow">Bokningar</p><h1 id="pageTitle">Översikt</h1><small id="syncStatus" class="muted">Version 2.1 · Ansluter…</small></div>
+    <div><p class="eyebrow">Bokningar</p><h1 id="pageTitle">Översikt</h1><small id="syncStatus" class="muted">Version 2.2 · Ansluter…</small></div>
     <button id="logoutBtn" class="ghost">Logga ut</button>
   </div></header>
   <main>
@@ -85,7 +93,29 @@
       <div class="card" style="padding:20px;margin-bottom:16px"><h2>Min profil</h2><p>Inloggad som <strong id="settingsUser"></strong></p>
         <form id="profileForm"><label>Visningsnamn<input id="displayNameInput" maxlength="40" required></label><button class="primary" type="submit">Spara namn</button><p id="profileMsg" class="error"></p></form>
       </div>
-      <div id="adminSection" class="hidden"><div class="section-head"><h2>Hantera bokningsobjekt</h2><button id="addResourceBtn" class="primary">+ Nytt objekt</button></div><div id="resourceAdminList" class="resource-admin"></div></div>
+      <div id="adminSection" class="hidden">
+        <div class="section-head"><h2>Administration</h2></div>
+        <div class="admin-menu">
+          <button class="active" data-admin-view="objects">📂 Bokningsobjekt</button>
+          <button data-admin-view="archived">📦 Arkiverade</button>
+          <button data-admin-view="info">⚙️ Information</button>
+        </div>
+        <section id="adminObjects" class="admin-panel-section active">
+          <div class="section-head"><h3>Aktiva bokningsobjekt</h3><button id="addResourceBtn" class="primary">+ Nytt objekt</button></div>
+          <div id="resourceAdminList" class="resource-admin"></div>
+        </section>
+        <section id="adminArchived" class="admin-panel-section">
+          <div class="section-head"><h3>Arkiverade objekt</h3></div>
+          <div id="archivedResourceList" class="resource-admin"></div>
+        </section>
+        <section id="adminInfo" class="admin-panel-section">
+          <div class="card warning-card">
+            <h3>Skillnaden mellan Arkivera och Ta bort</h3>
+            <p><strong>Arkivera</strong> gömmer objektet men sparar bokningshistoriken. Det kan återställas.</p>
+            <p><strong>Ta bort</strong> raderar objektet helt och är bara möjligt när objektet saknar bokningar.</p>
+          </div>
+        </section>
+      </div>
     </section>
   </main>
   <nav class="bottom-nav">
@@ -122,7 +152,7 @@ const DEFAULT_RESOURCES=[
   {id:"backora",name:"Bäcköra",icon:"🏡",color:"#9b6a2f",description:"Bäcköra",order:3,active:true}
 ];
 const $=id=>document.getElementById(id);
-let user=null,profile=null,resources=[],bookings=[],currentResourceId=null,viewDate=new Date(),unsubs=[];
+let user=null,profile=null,allResources=[],resources=[],bookings=[],currentResourceId=null,viewDate=new Date(),unsubs=[];
 const isAdmin=()=>ADMIN_EMAILS.includes((user?.email||"").toLowerCase());
 const iso=d=>{let x=new Date(d);x.setMinutes(x.getMinutes()-x.getTimezoneOffset());return x.toISOString().slice(0,10)};
 const dates=(a,b)=>{let r=[],d=new Date(a+"T12:00:00"),e=new Date(b+"T12:00:00");while(d<=e){r.push(iso(d));d.setDate(d.getDate()+1)}return r};
@@ -153,8 +183,9 @@ async function loadProfile(){
 function listenData(){
   $("syncStatus").textContent="Synkroniserar…";
   unsubs.push(onSnapshot(collection(db,"resources"),async snap=>{
-    resources=snap.docs.map(d=>({id:d.id,...d.data()})).filter(r=>r.active!==false).sort((a,b)=>(a.order||99)-(b.order||99));
-    if(!resources.length&&isAdmin()){const batch=writeBatch(db);DEFAULT_RESOURCES.forEach(r=>batch.set(doc(db,"resources",r.id),{...r,createdAt:serverTimestamp(),createdBy:user.uid}));await batch.commit();return}
+    allResources=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(a.order||99)-(b.order||99));
+    resources=allResources.filter(r=>r.active!==false);
+    if(!allResources.length&&isAdmin()){const batch=writeBatch(db);DEFAULT_RESOURCES.forEach(r=>batch.set(doc(db,"resources",r.id),{...r,createdAt:serverTimestamp(),createdBy:user.uid}));await batch.commit();return}
     if(!currentResourceId&&resources.length)currentResourceId=resources[0].id;
     renderAll();
   },e=>$("syncStatus").textContent="Fel: "+errText(e)));
@@ -190,7 +221,9 @@ function renderAll(){
   const r=resourceById(currentResourceId);$("resourceTitle").textContent=r?`${r.icon||"📅"} ${r.name}`:"Kalender";
   $("resourcePills").innerHTML=resources.map(x=>`<button class="pill ${x.id===currentResourceId?"active":""}" data-resource="${x.id}">${esc(x.icon||"📅")} ${esc(x.name)}</button>`).join("");
   const rb=bookings.filter(b=>b.resourceId===currentResourceId);$("resourceBookings").innerHTML=rb.length?rb.map(bookingCard).join(""):'<div class="card muted" style="padding:18px">Inga bokningar för detta objekt.</div>';
-  $("resourceAdminList").innerHTML=resources.map(x=>`<div class="card admin-row"><div><strong>${esc(x.icon||"📅")} ${esc(x.name)}</strong><div class="muted">${esc(x.description||"")}</div></div><div><button class="ghost" data-edit-resource="${x.id}">Ändra</button> <button class="danger" data-remove-resource="${x.id}">Arkivera</button></div></div>`).join("");
+  $("resourceAdminList").innerHTML=resources.length?resources.map(x=>`<div class="card admin-row"><div><strong>${esc(x.icon||"📅")} ${esc(x.name)}</strong><div class="muted">${esc(x.description||"")}</div></div><div class="admin-actions"><button class="ghost" data-edit-resource="${x.id}">Ändra</button><button class="ghost" data-archive-resource="${x.id}">Arkivera</button><button class="danger" data-delete-resource="${x.id}">Ta bort</button></div></div>`).join(""):'<div class="card muted" style="padding:16px">Inga aktiva objekt.</div>';
+  const archived=allResources.filter(x=>x.active===false);
+  $("archivedResourceList").innerHTML=archived.length?archived.map(x=>`<div class="card admin-row"><div><strong>${esc(x.icon||"📅")} ${esc(x.name)}</strong><div class="muted">${esc(x.description||"")}</div></div><div class="admin-actions"><button class="primary" data-restore-resource="${x.id}">Återställ</button><button class="danger" data-delete-resource="${x.id}">Ta bort</button></div></div>`).join(""):'<div class="card muted" style="padding:16px">Inga arkiverade objekt.</div>';
   bindActions();renderCalendar();
 }
 function bindActions(){
@@ -199,7 +232,9 @@ function bindActions(){
   document.querySelectorAll("[data-resource]").forEach(x=>x.onclick=()=>{currentResourceId=x.dataset.resource;renderAll()});
   document.querySelectorAll("[data-delete]").forEach(x=>x.onclick=()=>removeBooking(x.dataset.delete));
   document.querySelectorAll("[data-edit-resource]").forEach(x=>x.onclick=()=>openResourceDialog(x.dataset.editResource));
-  document.querySelectorAll("[data-remove-resource]").forEach(x=>x.onclick=()=>archiveResource(x.dataset.removeResource));
+  document.querySelectorAll("[data-archive-resource]").forEach(x=>x.onclick=()=>archiveResource(x.dataset.archiveResource));
+  document.querySelectorAll("[data-delete-resource]").forEach(x=>x.onclick=()=>deleteResource(x.dataset.deleteResource));
+  document.querySelectorAll("[data-restore-resource]").forEach(x=>x.onclick=()=>restoreResource(x.dataset.restoreResource));
 }
 function renderCalendar(){
   const y=viewDate.getFullYear(),m=viewDate.getMonth(),off=(new Date(y,m,1).getDay()+6)%7,n=new Date(y,m+1,0).getDate(),today=iso(new Date());
@@ -237,11 +272,38 @@ async function removeBooking(id){
 $("profileForm").onsubmit=async e=>{e.preventDefault();const name=$("displayNameInput").value.trim();if(!name)return;try{await setDoc(doc(db,"profiles",user.uid),{displayName:name,email:user.email,updatedAt:serverTimestamp()},{merge:true});profile={...profile,displayName:name};$("welcomeName").textContent=name;$("profileMsg").textContent="Sparat.";renderAll()}catch(x){$("profileMsg").textContent=errText(x)}};
 $("addResourceBtn").onclick=()=>openResourceDialog();$("addResourceTop").onclick=()=>openResourceDialog();
 function openResourceDialog(id=""){
-  if(!isAdmin())return;const r=resourceById(id);$("resourceForm").reset();$("resourceId").value=id;$("resourceDialogTitle").textContent=r?"Ändra objekt":"Lägg till objekt";$("resourceName").value=r?.name||"";$("resourceIcon").value=r?.icon||"📅";$("resourceColor").value=r?.color||"#155e4b";$("resourceDescription").value=r?.description||"";$("resourceError").textContent="";$("resourceDialog").showModal()
+  if(!isAdmin())return;const r=allResources.find(x=>x.id===id);$("resourceForm").reset();$("resourceId").value=id;$("resourceDialogTitle").textContent=r?"Ändra objekt":"Lägg till objekt";$("resourceName").value=r?.name||"";$("resourceIcon").value=r?.icon||"📅";$("resourceColor").value=r?.color||"#155e4b";$("resourceDescription").value=r?.description||"";$("resourceError").textContent="";$("resourceDialog").showModal()
 }
 $("resourceForm").onsubmit=async e=>{e.preventDefault();if(!isAdmin())return;const existing=$("resourceId").value,name=$("resourceName").value.trim(),id=existing||slug(name);try{await setDoc(doc(db,"resources",id),{name,icon:$("resourceIcon").value.trim()||"📅",color:$("resourceColor").value,description:$("resourceDescription").value.trim(),active:true,order:resourceById(existing)?.order||resources.length+1,updatedAt:serverTimestamp(),updatedBy:user.uid},{merge:true});$("resourceDialog").close()}catch(x){$("resourceError").textContent=errText(x)}};
-async function archiveResource(id){if(!isAdmin()||!confirm("Vill du arkivera detta bokningsobjekt? Befintliga bokningar sparas."))return;try{await setDoc(doc(db,"resources",id),{active:false,updatedAt:serverTimestamp()},{merge:true})}catch(x){alert(errText(x))}}
+async function archiveResource(id){
+  if(!isAdmin()||!confirm("Vill du arkivera detta bokningsobjekt? Det försvinner från översikten men bokningshistoriken sparas."))return;
+  try{await setDoc(doc(db,"resources",id),{active:false,updatedAt:serverTimestamp(),updatedBy:user.uid},{merge:true})}
+  catch(x){alert(errText(x))}
+}
+async function restoreResource(id){
+  if(!isAdmin())return;
+  try{await setDoc(doc(db,"resources",id),{active:true,updatedAt:serverTimestamp(),updatedBy:user.uid},{merge:true})}
+  catch(x){alert(errText(x))}
+}
+async function deleteResource(id){
+  if(!isAdmin())return;
+  const r=allResources.find(x=>x.id===id);
+  const linked=bookings.filter(b=>bookingResourceId(b)===id);
+  if(linked.length){
+    alert(`Det går inte att ta bort ${r?.name||"objektet"} eftersom det finns ${linked.length} bokning${linked.length===1?"":"ar"}. Arkivera objektet i stället.`);
+    return;
+  }
+  if(!confirm(`Är du säker på att du vill ta bort ${r?.name||"detta objekt"} permanent? Detta går inte att ångra.`))return;
+  try{await deleteDoc(doc(db,"resources",id))}
+  catch(x){alert(errText(x))}
+}
 document.querySelectorAll("[data-close]").forEach(x=>x.onclick=() => $(x.dataset.close).close());
+document.querySelectorAll("[data-admin-view]").forEach(btn=>btn.onclick=()=>{
+  document.querySelectorAll("[data-admin-view]").forEach(x=>x.classList.toggle("active",x===btn));
+  document.querySelectorAll(".admin-panel-section").forEach(x=>x.classList.remove("active"));
+  const target={objects:"adminObjects",archived:"adminArchived",info:"adminInfo"}[btn.dataset.adminView];
+  if(target)$(target).classList.add("active");
+});
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.getRegistrations()
     .then(items => items.forEach(item => item.unregister()))
