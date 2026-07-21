@@ -1,278 +1,353 @@
 <!DOCTYPE html>
 <html lang="sv">
+
 <head>
-  <link rel="stylesheet href=styles.css>"
-  <meta charset="UTF-8">
+  <link rel="stylesheet href=styles.css>" <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#155e4b">
   <meta name="version" content="2.3.0">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Bokningar">
-  
+
   <link rel="icon" href="icon.svg" type="image/svg+xml">
   <title>Familjebokningar – Version 2.4</title>
-  
-    
+
+
 </head>
+
 <body>
-<div id="loginView" class="screen centered">
-  <section class="card login-card">
-    <div class="logo">B</div><h1>Bokningar</h1><p class="muted">Familjens gemensamma bokningsapp</p><p class="eyebrow">Version 2.3</p>
-    <form id="loginForm">
-      <label>E-postadress<input id="emailInput" type="email" autocomplete="username" required></label>
-      <label>Lösenord<input id="passwordInput" type="password" autocomplete="current-password" required></label>
-      <p id="loginError" class="error"></p><button class="primary" type="submit">Logga in</button>
-    </form>
-  </section>
-</div>
-
-<div id="appView" class="screen hidden">
-  <header class="topbar"><div class="toprow">
-    <div><p class="eyebrow">Bokningar</p><h1 id="pageTitle">Översikt</h1><small id="syncStatus" class="muted">Version 2.3 · Ansluter…</small></div>
-    <button id="logoutBtn" class="ghost">Logga ut</button>
-  </div></header>
-  <main>
-    <section id="homeTab" class="tab active">
-      <div class="card hero"><div class="hero-row"><div><p class="eyebrow">Välkommen</p><h2 id="welcomeName">Christin</h2><p class="muted">Se vad som är ledigt och boka direkt.</p></div><button id="quickBookBtn" class="primary">+ Ny bokning</button></div></div>
-      <div class="section-head"><h2>Bokningsobjekt</h2><button id="addResourceTop" class="ghost admin-only hidden">+ Lägg till</button></div>
-      <div id="resourceGrid" class="resource-grid"></div>
-      <div class="section-head"><h2>Kommande bokningar</h2></div><div id="upcomingList" class="booking-list"></div>
+  <div id="loginView" class="screen centered">
+    <section class="card login-card">
+      <div class="logo">B</div>
+      <h1>Bokningar</h1>
+      <p class="muted">Familjens gemensamma bokningsapp</p>
+      <p class="eyebrow">Version 2.3</p>
+      <form id="loginForm">
+        <label>E-postadress<input id="emailInput" type="email" autocomplete="username" required></label>
+        <label>Lösenord<input id="passwordInput" type="password" autocomplete="current-password" required></label>
+        <p id="loginError" class="error"></p><button class="primary" type="submit">Logga in</button>
+      </form>
     </section>
+  </div>
 
-    <section id="resourceTab" class="tab">
-      <div id="resourcePills" class="pillbar"></div>
-      <div class="card resource-header"><div><p class="eyebrow">Kalender</p><h2 id="resourceTitle"></h2></div><button id="newBookingBtn" class="primary">+ Boka</button></div>
-      <div class="card calendar-card"><div class="month-nav"><button id="prevMonth" class="ghost">‹</button><h3 id="monthLabel"></h3><button id="nextMonth" class="ghost">›</button></div><div class="weekdays"><span>Mån</span><span>Tis</span><span>Ons</span><span>Tor</span><span>Fre</span><span>Lör</span><span>Sön</span></div><div id="calendarGrid" class="calendar-grid"></div></div>
-      <div class="section-head"><h2>Bokningar</h2></div><div id="resourceBookings" class="booking-list"></div>
-    </section>
-
-    <section id="settingsTab" class="tab">
-      <div class="card" style="padding:20px;margin-bottom:16px"><h2>Min profil</h2><p>Inloggad som <strong id="settingsUser"></strong></p>
-        <form id="profileForm"><label>Visningsnamn<input id="displayNameInput" maxlength="40" required></label><button class="primary" type="submit">Spara namn</button><p id="profileMsg" class="error"></p></form>
-      </div>
-      <div id="adminSection" class="hidden">
-        <div class="section-head"><h2>Administration</h2></div>
-        <div class="admin-menu">
-          <button class="active" data-admin-view="objects">📂 Bokningsobjekt</button>
-          <button data-admin-view="archived">📦 Arkiverade</button>
-          <button data-admin-view="info">⚙️ Information</button>
+  <div id="appView" class="screen hidden">
+    <header class="topbar">
+      <div class="toprow">
+        <div>
+          <p class="eyebrow">Bokningar</p>
+          <h1 id="pageTitle">Översikt</h1><small id="syncStatus" class="muted">Version 2.3 · Ansluter…</small>
         </div>
-        <section id="adminObjects" class="admin-panel-section active">
-          <div class="section-head"><h3>Aktiva bokningsobjekt</h3><button id="addResourceBtn" class="primary">+ Nytt objekt</button></div>
-          <div id="resourceAdminList" class="resource-admin"></div>
-        </section>
-        <section id="adminArchived" class="admin-panel-section">
-          <div class="section-head"><h3>Arkiverade objekt</h3></div>
-          <div id="archivedResourceList" class="resource-admin"></div>
-        </section>
-        <section id="adminInfo" class="admin-panel-section">
-          <div class="card" style="padding:14px;margin-bottom:12px">
-            <h3>🔄 Automatisk uppdatering</h3>
-            <p>När engångsinstallationen är klar kan nästa version installeras genom att ladda upp en enda fil med namnet <strong>update.zip</strong> till GitHub.</p>
-            <p class="muted">GitHub packar upp filen och Netlify publicerar den nya versionen automatiskt.</p>
-          </div>
-          <div class="card warning-card">
-            <h3>Skillnaden mellan Arkivera och Ta bort</h3>
-            <p><strong>Arkivera</strong> gömmer objektet men sparar bokningshistoriken. Det kan återställas.</p>
-            <p><strong>Ta bort</strong> raderar objektet helt och är bara möjligt när objektet saknar bokningar.</p>
-          </div>
-        </section>
+        <button id="logoutBtn" class="ghost">Logga ut</button>
       </div>
-    </section>
-  </main>
-  <nav class="bottom-nav">
-    <button data-tab="home" class="active">⌂<span>Översikt</span></button>
-    <button data-tab="calendar">▦<span>Kalender</span></button>
-    <button data-tab="settings">⚙<span>Inställningar</span></button>
-  </nav>
-</div>
+    </header>
+    <main>
+      <section id="homeTab" class="tab active">
+        <div class="card hero">
+          <div class="hero-row">
+            <div>
+              <p class="eyebrow">Välkommen</p>
+              <h2 id="welcomeName">Christin</h2>
+              <p class="muted">Se vad som är ledigt och boka direkt.</p>
+            </div><button id="quickBookBtn" class="primary">+ Ny bokning</button>
+          </div>
+        </div>
+        <div class="section-head">
+          <h2>Bokningsobjekt</h2><button id="addResourceTop" class="ghost admin-only hidden">+ Lägg till</button>
+        </div>
+        <div id="resourceGrid" class="resource-grid"></div>
+        <div class="section-head">
+          <h2>Kommande bokningar</h2>
+        </div>
+        <div id="upcomingList" class="booking-list"></div>
+      </section>
 
-<dialog id="bookingDialog"><form id="bookingForm" method="dialog">
-  <div class="dialog-head"><div><p class="eyebrow">Ny bokning</p><h2 id="dialogResource"></h2></div><button type="button" class="ghost" data-close="bookingDialog">✕</button></div>
-  <label>Från<input id="startDate" type="date" required></label><label>Till<input id="endDate" type="date" required></label>
-  <label>Kommentar<textarea id="comment" rows="3" placeholder="Valfritt"></textarea></label><p id="formError" class="error"></p><button class="primary" type="submit">Spara bokning</button>
-</form></dialog>
+      <section id="resourceTab" class="tab">
+        <div id="resourcePills" class="pillbar"></div>
+        <div class="card resource-header">
+          <div>
+            <p class="eyebrow">Kalender</p>
+            <h2 id="resourceTitle"></h2>
+          </div><button id="newBookingBtn" class="primary">+ Boka</button>
+        </div>
+        <div class="card calendar-card">
+          <div class="month-nav"><button id="prevMonth" class="ghost">‹</button>
+            <h3 id="monthLabel"></h3><button id="nextMonth" class="ghost">›</button>
+          </div>
+          <div class="weekdays">
+            <span>Mån</span><span>Tis</span><span>Ons</span><span>Tor</span><span>Fre</span><span>Lör</span><span>Sön</span>
+          </div>
+          <div id="calendarGrid" class="calendar-grid"></div>
+        </div>
+        <div class="section-head">
+          <h2>Bokningar</h2>
+        </div>
+        <div id="resourceBookings" class="booking-list"></div>
+      </section>
 
-<dialog id="resourceDialog"><form id="resourceForm" method="dialog">
-  <div class="dialog-head"><div><p class="eyebrow">Bokningsobjekt</p><h2 id="resourceDialogTitle">Lägg till</h2></div><button type="button" class="ghost" data-close="resourceDialog">✕</button></div>
-  <input id="resourceId" type="hidden"><label>Namn<input id="resourceName" maxlength="40" required placeholder="Till exempel Båt"></label>
-  <div class="color-row"><label>Ikon eller emoji<input id="resourceIcon" maxlength="4" value="📅"></label><label>Färg<input id="resourceColor" type="color" value="#155e4b"></label></div>
-  <label>Beskrivning<textarea id="resourceDescription" rows="2" placeholder="Valfritt"></textarea></label><p id="resourceError" class="error"></p><button class="primary" type="submit">Spara objekt</button>
-</form></dialog>
+      <section id="settingsTab" class="tab">
+        <div class="card" style="padding:20px;margin-bottom:16px">
+          <h2>Min profil</h2>
+          <p>Inloggad som <strong id="settingsUser"></strong></p>
+          <form id="profileForm"><label>Visningsnamn<input id="displayNameInput" maxlength="40" required></label><button
+              class="primary" type="submit">Spara namn</button>
+            <p id="profileMsg" class="error"></p>
+          </form>
+        </div>
+        <div id="adminSection" class="hidden">
+          <div class="section-head">
+            <h2>Administration</h2>
+          </div>
+          <div class="admin-menu">
+            <button class="active" data-admin-view="objects">📂 Bokningsobjekt</button>
+            <button data-admin-view="archived">📦 Arkiverade</button>
+            <button data-admin-view="info">⚙️ Information</button>
+          </div>
+          <section id="adminObjects" class="admin-panel-section active">
+            <div class="section-head">
+              <h3>Aktiva bokningsobjekt</h3><button id="addResourceBtn" class="primary">+ Nytt objekt</button>
+            </div>
+            <div id="resourceAdminList" class="resource-admin"></div>
+          </section>
+          <section id="adminArchived" class="admin-panel-section">
+            <div class="section-head">
+              <h3>Arkiverade objekt</h3>
+            </div>
+            <div id="archivedResourceList" class="resource-admin"></div>
+          </section>
+          <section id="adminInfo" class="admin-panel-section">
+            <div class="card" style="padding:14px;margin-bottom:12px">
+              <h3>🔄 Automatisk uppdatering</h3>
+              <p>När engångsinstallationen är klar kan nästa version installeras genom att ladda upp en enda fil med
+                namnet <strong>update.zip</strong> till GitHub.</p>
+              <p class="muted">GitHub packar upp filen och Netlify publicerar den nya versionen automatiskt.</p>
+            </div>
+            <div class="card warning-card">
+              <h3>Skillnaden mellan Arkivera och Ta bort</h3>
+              <p><strong>Arkivera</strong> gömmer objektet men sparar bokningshistoriken. Det kan återställas.</p>
+              <p><strong>Ta bort</strong> raderar objektet helt och är bara möjligt när objektet saknar bokningar.</p>
+            </div>
+          </section>
+        </div>
+      </section>
+    </main>
+    <nav class="bottom-nav">
+      <button data-tab="home" class="active">⌂<span>Översikt</span></button>
+      <button data-tab="calendar">▦<span>Kalender</span></button>
+      <button data-tab="settings">⚙<span>Inställningar</span></button>
+    </nav>
+  </div>
 
-<script type="module">
-  
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
-import { getAuth,onAuthStateChanged,signInWithEmailAndPassword,signOut } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
-import { getFirestore,collection,doc,getDoc,setDoc,onSnapshot,runTransaction,serverTimestamp,deleteDoc,writeBatch } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+  <dialog id="bookingDialog">
+    <form id="bookingForm" method="dialog">
+      <div class="dialog-head">
+        <div>
+          <p class="eyebrow">Ny bokning</p>
+          <h2 id="dialogResource"></h2>
+        </div><button type="button" class="ghost" data-close="bookingDialog">✕</button>
+      </div>
+      <label>Från<input id="startDate" type="date" required></label><label>Till<input id="endDate" type="date"
+          required></label>
+      <label>Kommentar<textarea id="comment" rows="3" placeholder="Valfritt"></textarea></label>
+      <p id="formError" class="error"></p><button class="primary" type="submit">Spara bokning</button>
+    </form>
+  </dialog>
 
-const firebaseConfig={apiKey:"AIzaSyBeucnfeFb9awrRv8ziTmQZxBpMWF4OhpY",authDomain:"bokningar-deb17.firebaseapp.com",projectId:"bokningar-deb17",storageBucket:"bokningar-deb17.firebasestorage.app",messagingSenderId:"964863988500",appId:"1:964863988500:web:fe26f729eb390dcf676801",measurementId:"G-BH8Z38DDD9"};
-const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app);
-const ADMIN_EMAILS=["barabajen@gmail.com"];
-const DEFAULT_RESOURCES=[
-  {id:"bil",name:"Bil",icon:"🚗",color:"#176b57",description:"Familjens bil",order:1,active:true},
-  {id:"gotland",name:"Gotland",icon:"🏝️",color:"#2879a9",description:"Boendet på Gotland",order:2,active:true},
-  {id:"backora",name:"Bäcköra",icon:"🏡",color:"#9b6a2f",description:"Bäcköra",order:3,active:true}
-];
-const $=id=>document.getElementById(id);
-let user=null,profile=null,allResources=[],resources=[],bookings=[],currentResourceId=null,viewDate=new Date(),unsubs=[];
-const isAdmin=()=>ADMIN_EMAILS.includes((user?.email||"").toLowerCase());
-const iso=d=>{let x=new Date(d);x.setMinutes(x.getMinutes()-x.getTimezoneOffset());return x.toISOString().slice(0,10)};
-const dates=(a,b)=>{let r=[],d=new Date(a+"T12:00:00"),e=new Date(b+"T12:00:00");while(d<=e){r.push(iso(d));d.setDate(d.getDate()+1)}return r};
-const fmt=s=>new Date(s+"T12:00:00").toLocaleDateString("sv-SE",{day:"numeric",month:"short",year:"numeric"});
-const esc=(t="")=>String(t).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const slug=s=>(s||"resurs").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,35)||"resurs";
-function errText(e){const c=e?.code||"";if(c.includes("invalid-credential"))return"Fel e-postadress eller lösenord.";if(c.includes("permission-denied"))return"Du saknar behörighet för detta.";if(c.includes("network"))return"Kontrollera internetanslutningen.";return e?.message||"Något gick fel."}
-function resourceById(id){return resources.find(r=>r.id===id)}
-function displayNameFor(b){if(b.userId===user?.uid)return profile?.displayName||"Christin";return b.displayName||b.userEmail||"Familjemedlem"}
-$("loginForm").onsubmit=async e=>{e.preventDefault();$("loginError").textContent="Loggar in…";try{await signInWithEmailAndPassword(auth,$("emailInput").value.trim(),$("passwordInput").value);$("loginError").textContent=""}catch(x){$("loginError").textContent=errText(x)}};
-$("logoutBtn").onclick=()=>signOut(auth);
-onAuthStateChanged(auth,async u=>{
-  user=u;$("loginView").classList.toggle("hidden",!!u);$("appView").classList.toggle("hidden",!u);unsubs.forEach(f=>f());unsubs=[];
-  if(!u)return;
-  $("settingsUser").textContent=u.email;
-  await loadProfile();
-  listenData();
-  showTab("home");
-});
-async function loadProfile(){
-  const ref=doc(db,"profiles",user.uid),snap=await getDoc(ref);
-  if(snap.exists())profile=snap.data();else{
-    profile={displayName:isAdmin()?"Christin":(user.email?.split("@")[0]||"Familjemedlem"),email:user.email,updatedAt:serverTimestamp()};
-    try{await setDoc(ref,profile)}catch{}
-  }
-  $("welcomeName").textContent=profile.displayName||"Christin";$("displayNameInput").value=profile.displayName||"";
-}
-function listenData(){
-  $("syncStatus").textContent="Synkroniserar…";
-  unsubs.push(onSnapshot(collection(db,"resources"),async snap=>{
-    allResources=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(a.order||99)-(b.order||99));
-    resources=allResources.filter(r=>r.active!==false);
-    if(!allResources.length&&isAdmin()){const batch=writeBatch(db);DEFAULT_RESOURCES.forEach(r=>batch.set(doc(db,"resources",r.id),{...r,createdAt:serverTimestamp(),createdBy:user.uid}));await batch.commit();return}
-    if(!currentResourceId&&resources.length)currentResourceId=resources[0].id;
-    renderAll();
-  },e=>$("syncStatus").textContent="Fel: "+errText(e)));
-  unsubs.push(onSnapshot(collection(db,"bookings"),snap=>{
-    bookings=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(a.start||"").localeCompare(b.start||""));
-    $("syncStatus").textContent="Synkroniserad";renderAll();
-  },e=>$("syncStatus").textContent="Fel: "+errText(e)));
-}
-document.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>showTab(b.dataset.tab));
-function showTab(name){
-  document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));document.querySelectorAll(".bottom-nav button").forEach(x=>x.classList.toggle("active",x.dataset.tab===name));
-  if(name==="home"){$("homeTab").classList.add("active");$("pageTitle").textContent="Översikt"}
-  if(name==="calendar"){$("resourceTab").classList.add("active");$("pageTitle").textContent="Kalender"}
-  if(name==="settings"){$("settingsTab").classList.add("active");$("pageTitle").textContent="Inställningar"}
-  renderAll();
-}
-function resourceCard(r){
-  const today=iso(new Date()),next=bookings.filter(b=>b.resourceId===r.id&&b.end>=today)[0];
-  const line=next?`${fmt(next.start)}–${fmt(next.end)} · ${esc(displayNameFor(next))}`:"Ledig – inga kommande bokningar";
-  return `<article class="card resource-card" style="--accent:${esc(r.color||"#155e4b")}"><div><div class="resource-icon">${esc(r.icon||"📅")}</div><h3>${esc(r.name)}</h3><p class="muted">${esc(r.description||"")}</p><p class="status">${line}</p></div><div class="resource-actions"><button class="ghost" data-open-cal="${r.id}">Kalender</button><button class="primary" data-book="${r.id}">Boka</button></div></article>`;
-}
-function bookingCard(b){
-  const r=resourceById(b.resourceId)||{name:b.resource||"Bokning",color:"#155e4b"};
-  const mine=b.userId===user?.uid;
-  return `<article class="card booking" style="border-left-color:${esc(r.color||"#155e4b")}"><div><h4>${esc(r.icon||"")} ${esc(r.name)}</h4><p>${fmt(b.start)} – ${fmt(b.end)}</p><p>Bokad av ${esc(displayNameFor(b))}${b.comment?" · "+esc(b.comment):""}</p></div>${mine||isAdmin()?`<button class="danger" data-delete="${b.id}">Ta bort</button>`:""}</article>`;
-}
-function renderAll(){
-  if(!user)return;
-  document.querySelectorAll(".admin-only").forEach(x=>x.classList.toggle("hidden",!isAdmin()));$("adminSection").classList.toggle("hidden",!isAdmin());
-  $("resourceGrid").innerHTML=resources.length?resources.map(resourceCard).join(""):'<div class="card" style="padding:18px">Inga bokningsobjekt ännu.</div>';
-  const today=iso(new Date()),up=bookings.filter(b=>b.end>=today).slice(0,12);$("upcomingList").innerHTML=up.length?up.map(bookingCard).join(""):'<div class="card muted" style="padding:18px">Inga kommande bokningar.</div>';
-  if(currentResourceId&&!resourceById(currentResourceId)&&resources.length)currentResourceId=resources[0].id;
-  const r=resourceById(currentResourceId);$("resourceTitle").textContent=r?`${r.icon||"📅"} ${r.name}`:"Kalender";
-  $("resourcePills").innerHTML=resources.map(x=>`<button class="pill ${x.id===currentResourceId?"active":""}" data-resource="${x.id}">${esc(x.icon||"📅")} ${esc(x.name)}</button>`).join("");
-  const rb=bookings.filter(b=>b.resourceId===currentResourceId);$("resourceBookings").innerHTML=rb.length?rb.map(bookingCard).join(""):'<div class="card muted" style="padding:18px">Inga bokningar för detta objekt.</div>';
-  $("resourceAdminList").innerHTML=resources.length?resources.map(x=>`<div class="card admin-row"><div><strong>${esc(x.icon||"📅")} ${esc(x.name)}</strong><div class="muted">${esc(x.description||"")}</div></div><div class="admin-actions"><button class="ghost" data-edit-resource="${x.id}">Ändra</button><button class="ghost" data-archive-resource="${x.id}">Arkivera</button><button class="danger" data-delete-resource="${x.id}">Ta bort</button></div></div>`).join(""):'<div class="card muted" style="padding:16px">Inga aktiva objekt.</div>';
-  const archived=allResources.filter(x=>x.active===false);
-  $("archivedResourceList").innerHTML=archived.length?archived.map(x=>`<div class="card admin-row"><div><strong>${esc(x.icon||"📅")} ${esc(x.name)}</strong><div class="muted">${esc(x.description||"")}</div></div><div class="admin-actions"><button class="primary" data-restore-resource="${x.id}">Återställ</button><button class="danger" data-delete-resource="${x.id}">Ta bort</button></div></div>`).join(""):'<div class="card muted" style="padding:16px">Inga arkiverade objekt.</div>';
-  bindActions();renderCalendar();
-}
-function bindActions(){
-  document.querySelectorAll("[data-open-cal]").forEach(x=>x.onclick=()=>{currentResourceId=x.dataset.openCal;showTab("calendar")});
-  document.querySelectorAll("[data-book]").forEach(x=>x.onclick=()=>openBooking(x.dataset.book));
-  document.querySelectorAll("[data-resource]").forEach(x=>x.onclick=()=>{currentResourceId=x.dataset.resource;renderAll()});
-  document.querySelectorAll("[data-delete]").forEach(x=>x.onclick=()=>removeBooking(x.dataset.delete));
-  document.querySelectorAll("[data-edit-resource]").forEach(x=>x.onclick=()=>openResourceDialog(x.dataset.editResource));
-  document.querySelectorAll("[data-archive-resource]").forEach(x=>x.onclick=()=>archiveResource(x.dataset.archiveResource));
-  document.querySelectorAll("[data-delete-resource]").forEach(x=>x.onclick=()=>deleteResource(x.dataset.deleteResource));
-  document.querySelectorAll("[data-restore-resource]").forEach(x=>x.onclick=()=>restoreResource(x.dataset.restoreResource));
-}
-function renderCalendar(){
-  const y=viewDate.getFullYear(),m=viewDate.getMonth(),off=(new Date(y,m,1).getDay()+6)%7,n=new Date(y,m+1,0).getDate(),today=iso(new Date());
-  $("monthLabel").textContent=viewDate.toLocaleDateString("sv-SE",{month:"long",year:"numeric"});let h="";
-  for(let i=0;i<off;i++)h+='<div class="day empty"></div>';
-  for(let d=1;d<=n;d++){const dt=iso(new Date(y,m,d,12)),b=bookings.find(x=>x.resourceId===currentResourceId&&dt>=x.start&&dt<=x.end),mine=b?.userId===user?.uid;
-    h+=`<div class="day ${b?"busy":""} ${mine?"mine":""} ${dt===today?"today":""}"><strong>${d}</strong>${b?`<small>${esc(displayNameFor(b))}</small>`:""}<button aria-label="${b?"Bokad "+displayNameFor(b):"Boka "+dt}" data-day="${dt}"></button></div>`;
-  }
-  $("calendarGrid").innerHTML=h;document.querySelectorAll("[data-day]").forEach(x=>x.onclick=()=>{const dt=x.dataset.day,b=bookings.find(v=>v.resourceId===currentResourceId&&dt>=v.start&&dt<=v.end);if(b)alert(`${displayNameFor(b)} har bokat ${fmt(b.start)}–${fmt(b.end)}${b.comment?`\n${b.comment}`:""}`);else openBooking(currentResourceId,dt)});
-}
-$("prevMonth").onclick=()=>{viewDate=new Date(viewDate.getFullYear(),viewDate.getMonth()-1,1);renderCalendar()};
-$("nextMonth").onclick=()=>{viewDate=new Date(viewDate.getFullYear(),viewDate.getMonth()+1,1);renderCalendar()};
-$("newBookingBtn").onclick=()=>openBooking(currentResourceId);$("quickBookBtn").onclick=()=>openBooking(currentResourceId||resources[0]?.id);
-function openBooking(resourceId,day=""){currentResourceId=resourceId||currentResourceId;const r=resourceById(currentResourceId);if(!r)return alert("Lägg först till ett bokningsobjekt.");$("bookingForm").reset();$("dialogResource").textContent=`${r.icon||"📅"} ${r.name}`;$("formError").textContent="";const t=iso(new Date()),chosen=day||t;$("startDate").min=t;$("endDate").min=t;$("startDate").value=chosen;$("endDate").value=chosen;$("bookingDialog").showModal()}
-$("startDate").onchange=()=>{$("endDate").min=$("startDate").value;if(!$("endDate").value||$("endDate").value<$("startDate").value)$("endDate").value=$("startDate").value};
-$("bookingForm").onsubmit=async e=>{
-  e.preventDefault();const start=$("startDate").value,end=$("endDate").value,comment=$("comment").value.trim(),r=resourceById(currentResourceId);
-  if(!start||!end||end<start){$("formError").textContent="Kontrollera datumen.";return}
-  $("formError").textContent="Sparar…";const bookingRef=doc(collection(db,"bookings")),ds=dates(start,end);
-  try{await runTransaction(db,async tx=>{
-    const refs=ds.map(d=>doc(db,"bookingLocks",`${currentResourceId}__${d}`));const snaps=[];
-    for(const ref of refs)snaps.push(await tx.get(ref));if(snaps.some(s=>s.exists()))throw new Error("DUBBEL");
-    tx.set(bookingRef,{resourceId:currentResourceId,resource:r.name,start,end,comment,userId:user.uid,userEmail:user.email,displayName:profile?.displayName||"Christin",createdAt:serverTimestamp()});
-    refs.forEach((ref,i)=>tx.set(ref,{bookingId:bookingRef.id,resourceId:currentResourceId,date:ds[i],userId:user.uid}));
-  });$("bookingDialog").close()}catch(x){$("formError").textContent=x.message==="DUBBEL"?"Något av datumen är redan bokat.":errText(x)}
-};
-async function removeBooking(id){
-  const b=bookings.find(x=>x.id===id);if(!b||(!isAdmin()&&b.userId!==user.uid)||!confirm("Vill du ta bort bokningen?"))return;
-  try{await runTransaction(db,async tx=>{
-    const lockRefs=dates(b.start,b.end).map(d=>doc(db,"bookingLocks",`${b.resourceId||slug(b.resource)}__${d}`));const snaps=[];
-    for(const ref of lockRefs)snaps.push(await tx.get(ref));tx.delete(doc(db,"bookings",id));
-    snaps.forEach((s,i)=>{if(s.exists()&&s.data().bookingId===id)tx.delete(lockRefs[i])});
-  })}catch(x){alert(errText(x))}
-}
-$("profileForm").onsubmit=async e=>{e.preventDefault();const name=$("displayNameInput").value.trim();if(!name)return;try{await setDoc(doc(db,"profiles",user.uid),{displayName:name,email:user.email,updatedAt:serverTimestamp()},{merge:true});profile={...profile,displayName:name};$("welcomeName").textContent=name;$("profileMsg").textContent="Sparat.";renderAll()}catch(x){$("profileMsg").textContent=errText(x)}};
-$("addResourceBtn").onclick=()=>openResourceDialog();$("addResourceTop").onclick=()=>openResourceDialog();
-function openResourceDialog(id=""){
-  if(!isAdmin())return;const r=allResources.find(x=>x.id===id);$("resourceForm").reset();$("resourceId").value=id;$("resourceDialogTitle").textContent=r?"Ändra objekt":"Lägg till objekt";$("resourceName").value=r?.name||"";$("resourceIcon").value=r?.icon||"📅";$("resourceColor").value=r?.color||"#155e4b";$("resourceDescription").value=r?.description||"";$("resourceError").textContent="";$("resourceDialog").showModal()
-}
-$("resourceForm").onsubmit=async e=>{e.preventDefault();if(!isAdmin())return;const existing=$("resourceId").value,name=$("resourceName").value.trim(),id=existing||slug(name);try{await setDoc(doc(db,"resources",id),{name,icon:$("resourceIcon").value.trim()||"📅",color:$("resourceColor").value,description:$("resourceDescription").value.trim(),active:true,order:resourceById(existing)?.order||resources.length+1,updatedAt:serverTimestamp(),updatedBy:user.uid},{merge:true});$("resourceDialog").close()}catch(x){$("resourceError").textContent=errText(x)}};
-async function archiveResource(id){
-  if(!isAdmin()||!confirm("Vill du arkivera detta bokningsobjekt? Det försvinner från översikten men bokningshistoriken sparas."))return;
-  try{await setDoc(doc(db,"resources",id),{active:false,updatedAt:serverTimestamp(),updatedBy:user.uid},{merge:true})}
-  catch(x){alert(errText(x))}
-}
-async function restoreResource(id){
-  if(!isAdmin())return;
-  try{await setDoc(doc(db,"resources",id),{active:true,updatedAt:serverTimestamp(),updatedBy:user.uid},{merge:true})}
-  catch(x){alert(errText(x))}
-}
-async function deleteResource(id){
-  if(!isAdmin())return;
-  const r=allResources.find(x=>x.id===id);
-  const linked=bookings.filter(b=>bookingResourceId(b)===id);
-  if(linked.length){
-    alert(`Det går inte att ta bort ${r?.name||"objektet"} eftersom det finns ${linked.length} bokning${linked.length===1?"":"ar"}. Arkivera objektet i stället.`);
-    return;
-  }
-  if(!confirm(`Är du säker på att du vill ta bort ${r?.name||"detta objekt"} permanent? Detta går inte att ångra.`))return;
-  try{await deleteDoc(doc(db,"resources",id))}
-  catch(x){alert(errText(x))}
-}
-document.querySelectorAll("[data-close]").forEach(x=>x.onclick=() => $(x.dataset.close).close());
-document.querySelectorAll("[data-admin-view]").forEach(btn=>btn.onclick=()=>{
-  document.querySelectorAll("[data-admin-view]").forEach(x=>x.classList.toggle("active",x===btn));
-  document.querySelectorAll(".admin-panel-section").forEach(x=>x.classList.remove("active"));
-  const target={objects:"adminObjects",archived:"adminArchived",info:"adminInfo"}[btn.dataset.adminView];
-  if(target)$(target).classList.add("active");
-});
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.getRegistrations()
-    .then(items => items.forEach(item => item.unregister()))
-    .catch(() => {});
-}
-</script>
+  <dialog id="resourceDialog">
+    <form id="resourceForm" method="dialog">
+      <div class="dialog-head">
+        <div>
+          <p class="eyebrow">Bokningsobjekt</p>
+          <h2 id="resourceDialogTitle">Lägg till</h2>
+        </div><button type="button" class="ghost" data-close="resourceDialog">✕</button>
+      </div>
+      <input id="resourceId" type="hidden"><label>Namn<input id="resourceName" maxlength="40" required
+          placeholder="Till exempel Båt"></label>
+      <div class="color-row"><label>Ikon eller emoji<input id="resourceIcon" maxlength="4"
+            value="📅"></label><label>Färg<input id="resourceColor" type="color" value="#155e4b"></label></div>
+      <label>Beskrivning<textarea id="resourceDescription" rows="2" placeholder="Valfritt"></textarea></label>
+      <p id="resourceError" class="error"></p><button class="primary" type="submit">Spara objekt</button>
+    </form>
+  </dialog>
+
+  <script type="module">
+
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
+    import { getFirestore, collection, doc, getDoc, setDoc, onSnapshot, runTransaction, serverTimestamp, deleteDoc, writeBatch } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+
+    const firebaseConfig = { apiKey: "AIzaSyBeucnfeFb9awrRv8ziTmQZxBpMWF4OhpY", authDomain: "bokningar-deb17.firebaseapp.com", projectId: "bokningar-deb17", storageBucket: "bokningar-deb17.firebasestorage.app", messagingSenderId: "964863988500", appId: "1:964863988500:web:fe26f729eb390dcf676801", measurementId: "G-BH8Z38DDD9" };
+    const app = initializeApp(firebaseConfig), auth = getAuth(app), db = getFirestore(app);
+    const ADMIN_EMAILS = ["barabajen@gmail.com"];
+    const DEFAULT_RESOURCES = [
+      { id: "bil", name: "Bil", icon: "🚗", color: "#176b57", description: "Familjens bil", order: 1, active: true },
+      { id: "gotland", name: "Gotland", icon: "🏝️", color: "#2879a9", description: "Boendet på Gotland", order: 2, active: true },
+      { id: "backora", name: "Bäcköra", icon: "🏡", color: "#9b6a2f", description: "Bäcköra", order: 3, active: true }
+    ];
+    const $ = id => document.getElementById(id);
+    let user = null, profile = null, allResources = [], resources = [], bookings = [], currentResourceId = null, viewDate = new Date(), unsubs = [];
+    const isAdmin = () => ADMIN_EMAILS.includes((user?.email || "").toLowerCase());
+    const iso = d => { let x = new Date(d); x.setMinutes(x.getMinutes() - x.getTimezoneOffset()); return x.toISOString().slice(0, 10) };
+    const dates = (a, b) => { let r = [], d = new Date(a + "T12:00:00"), e = new Date(b + "T12:00:00"); while (d <= e) { r.push(iso(d)); d.setDate(d.getDate() + 1) } return r };
+    const fmt = s => new Date(s + "T12:00:00").toLocaleDateString("sv-SE", { day: "numeric", month: "short", year: "numeric" });
+    const esc = (t = "") => String(t).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+    const slug = s => (s || "resurs").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 35) || "resurs";
+    function errText(e) { const c = e?.code || ""; if (c.includes("invalid-credential")) return "Fel e-postadress eller lösenord."; if (c.includes("permission-denied")) return "Du saknar behörighet för detta."; if (c.includes("network")) return "Kontrollera internetanslutningen."; return e?.message || "Något gick fel." }
+    function resourceById(id) { return resources.find(r => r.id === id) }
+    function displayNameFor(b) { if (b.userId === user?.uid) return profile?.displayName || "Christin"; return b.displayName || b.userEmail || "Familjemedlem" }
+    $("loginForm").onsubmit = async e => { e.preventDefault(); $("loginError").textContent = "Loggar in…"; try { await signInWithEmailAndPassword(auth, $("emailInput").value.trim(), $("passwordInput").value); $("loginError").textContent = "" } catch (x) { $("loginError").textContent = errText(x) } };
+    $("logoutBtn").onclick = () => signOut(auth);
+    onAuthStateChanged(auth, async u => {
+      user = u; $("loginView").classList.toggle("hidden", !!u); $("appView").classList.toggle("hidden", !u); unsubs.forEach(f => f()); unsubs = [];
+      if (!u) return;
+      $("settingsUser").textContent = u.email;
+      await loadProfile();
+      listenData();
+      showTab("home");
+    });
+    async function loadProfile() {
+      const ref = doc(db, "profiles", user.uid), snap = await getDoc(ref);
+      if (snap.exists()) profile = snap.data(); else {
+        profile = { displayName: isAdmin() ? "Christin" : (user.email?.split("@")[0] || "Familjemedlem"), email: user.email, updatedAt: serverTimestamp() };
+        try { await setDoc(ref, profile) } catch { }
+      }
+      $("welcomeName").textContent = profile.displayName || "Christin"; $("displayNameInput").value = profile.displayName || "";
+    }
+    function listenData() {
+      $("syncStatus").textContent = "Synkroniserar…";
+      unsubs.push(onSnapshot(collection(db, "resources"), async snap => {
+        allResources = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => (a.order || 99) - (b.order || 99));
+        resources = allResources.filter(r => r.active !== false);
+        if (!allResources.length && isAdmin()) { const batch = writeBatch(db); DEFAULT_RESOURCES.forEach(r => batch.set(doc(db, "resources", r.id), { ...r, createdAt: serverTimestamp(), createdBy: user.uid })); await batch.commit(); return }
+        if (!currentResourceId && resources.length) currentResourceId = resources[0].id;
+        renderAll();
+      }, e => $("syncStatus").textContent = "Fel: " + errText(e)));
+      unsubs.push(onSnapshot(collection(db, "bookings"), snap => {
+        bookings = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => (a.start || "").localeCompare(b.start || ""));
+        $("syncStatus").textContent = "Synkroniserad"; renderAll();
+      }, e => $("syncStatus").textContent = "Fel: " + errText(e)));
+    }
+    document.querySelectorAll("[data-tab]").forEach(b => b.onclick = () => showTab(b.dataset.tab));
+    function showTab(name) {
+      document.querySelectorAll(".tab").forEach(x => x.classList.remove("active")); document.querySelectorAll(".bottom-nav button").forEach(x => x.classList.toggle("active", x.dataset.tab === name));
+      if (name === "home") { $("homeTab").classList.add("active"); $("pageTitle").textContent = "Översikt" }
+      if (name === "calendar") { $("resourceTab").classList.add("active"); $("pageTitle").textContent = "Kalender" }
+      if (name === "settings") { $("settingsTab").classList.add("active"); $("pageTitle").textContent = "Inställningar" }
+      renderAll();
+    }
+    function resourceCard(r) {
+      const today = iso(new Date()), next = bookings.filter(b => b.resourceId === r.id && b.end >= today)[0];
+      const line = next ? `${fmt(next.start)}–${fmt(next.end)} · ${esc(displayNameFor(next))}` : "Ledig – inga kommande bokningar";
+      return `<article class="card resource-card" style="--accent:${esc(r.color || "#155e4b")}"><div><div class="resource-icon">${esc(r.icon || "📅")}</div><h3>${esc(r.name)}</h3><p class="muted">${esc(r.description || "")}</p><p class="status">${line}</p></div><div class="resource-actions"><button class="ghost" data-open-cal="${r.id}">Kalender</button><button class="primary" data-book="${r.id}">Boka</button></div></article>`;
+    }
+    function bookingCard(b) {
+      const r = resourceById(b.resourceId) || { name: b.resource || "Bokning", color: "#155e4b" };
+      const mine = b.userId === user?.uid;
+      return `<article class="card booking" style="border-left-color:${esc(r.color || "#155e4b")}"><div><h4>${esc(r.icon || "")} ${esc(r.name)}</h4><p>${fmt(b.start)} – ${fmt(b.end)}</p><p>Bokad av ${esc(displayNameFor(b))}${b.comment ? " · " + esc(b.comment) : ""}</p></div>${mine || isAdmin() ? `<button class="danger" data-delete="${b.id}">Ta bort</button>` : ""}</article>`;
+    }
+    function renderAll() {
+      if (!user) return;
+      document.querySelectorAll(".admin-only").forEach(x => x.classList.toggle("hidden", !isAdmin())); $("adminSection").classList.toggle("hidden", !isAdmin());
+      $("resourceGrid").innerHTML = resources.length ? resources.map(resourceCard).join("") : '<div class="card" style="padding:18px">Inga bokningsobjekt ännu.</div>';
+      const today = iso(new Date()), up = bookings.filter(b => b.end >= today).slice(0, 12); $("upcomingList").innerHTML = up.length ? up.map(bookingCard).join("") : '<div class="card muted" style="padding:18px">Inga kommande bokningar.</div>';
+      if (currentResourceId && !resourceById(currentResourceId) && resources.length) currentResourceId = resources[0].id;
+      const r = resourceById(currentResourceId); $("resourceTitle").textContent = r ? `${r.icon || "📅"} ${r.name}` : "Kalender";
+      $("resourcePills").innerHTML = resources.map(x => `<button class="pill ${x.id === currentResourceId ? "active" : ""}" data-resource="${x.id}">${esc(x.icon || "📅")} ${esc(x.name)}</button>`).join("");
+      const rb = bookings.filter(b => b.resourceId === currentResourceId); $("resourceBookings").innerHTML = rb.length ? rb.map(bookingCard).join("") : '<div class="card muted" style="padding:18px">Inga bokningar för detta objekt.</div>';
+      $("resourceAdminList").innerHTML = resources.length ? resources.map(x => `<div class="card admin-row"><div><strong>${esc(x.icon || "📅")} ${esc(x.name)}</strong><div class="muted">${esc(x.description || "")}</div></div><div class="admin-actions"><button class="ghost" data-edit-resource="${x.id}">Ändra</button><button class="ghost" data-archive-resource="${x.id}">Arkivera</button><button class="danger" data-delete-resource="${x.id}">Ta bort</button></div></div>`).join("") : '<div class="card muted" style="padding:16px">Inga aktiva objekt.</div>';
+      const archived = allResources.filter(x => x.active === false);
+      $("archivedResourceList").innerHTML = archived.length ? archived.map(x => `<div class="card admin-row"><div><strong>${esc(x.icon || "📅")} ${esc(x.name)}</strong><div class="muted">${esc(x.description || "")}</div></div><div class="admin-actions"><button class="primary" data-restore-resource="${x.id}">Återställ</button><button class="danger" data-delete-resource="${x.id}">Ta bort</button></div></div>`).join("") : '<div class="card muted" style="padding:16px">Inga arkiverade objekt.</div>';
+      bindActions(); renderCalendar();
+    }
+    function bindActions() {
+      document.querySelectorAll("[data-open-cal]").forEach(x => x.onclick = () => { currentResourceId = x.dataset.openCal; showTab("calendar") });
+      document.querySelectorAll("[data-book]").forEach(x => x.onclick = () => openBooking(x.dataset.book));
+      document.querySelectorAll("[data-resource]").forEach(x => x.onclick = () => { currentResourceId = x.dataset.resource; renderAll() });
+      document.querySelectorAll("[data-delete]").forEach(x => x.onclick = () => removeBooking(x.dataset.delete));
+      document.querySelectorAll("[data-edit-resource]").forEach(x => x.onclick = () => openResourceDialog(x.dataset.editResource));
+      document.querySelectorAll("[data-archive-resource]").forEach(x => x.onclick = () => archiveResource(x.dataset.archiveResource));
+      document.querySelectorAll("[data-delete-resource]").forEach(x => x.onclick = () => deleteResource(x.dataset.deleteResource));
+      document.querySelectorAll("[data-restore-resource]").forEach(x => x.onclick = () => restoreResource(x.dataset.restoreResource));
+    }
+    function renderCalendar() {
+      const y = viewDate.getFullYear(), m = viewDate.getMonth(), off = (new Date(y, m, 1).getDay() + 6) % 7, n = new Date(y, m + 1, 0).getDate(), today = iso(new Date());
+      $("monthLabel").textContent = viewDate.toLocaleDateString("sv-SE", { month: "long", year: "numeric" }); let h = "";
+      for (let i = 0; i < off; i++)h += '<div class="day empty"></div>';
+      for (let d = 1; d <= n; d++) {
+        const dt = iso(new Date(y, m, d, 12)), b = bookings.find(x => x.resourceId === currentResourceId && dt >= x.start && dt <= x.end), mine = b?.userId === user?.uid;
+        h += `<div class="day ${b ? "busy" : ""} ${mine ? "mine" : ""} ${dt === today ? "today" : ""}"><strong>${d}</strong>${b ? `<small>${esc(displayNameFor(b))}</small>` : ""}<button aria-label="${b ? "Bokad " + displayNameFor(b) : "Boka " + dt}" data-day="${dt}"></button></div>`;
+      }
+      $("calendarGrid").innerHTML = h; document.querySelectorAll("[data-day]").forEach(x => x.onclick = () => { const dt = x.dataset.day, b = bookings.find(v => v.resourceId === currentResourceId && dt >= v.start && dt <= v.end); if (b) alert(`${displayNameFor(b)} har bokat ${fmt(b.start)}–${fmt(b.end)}${b.comment ? `\n${b.comment}` : ""}`); else openBooking(currentResourceId, dt) });
+    }
+    $("prevMonth").onclick = () => { viewDate = new Date(viewDate.getFullYear(), viewDate.getMonth() - 1, 1); renderCalendar() };
+    $("nextMonth").onclick = () => { viewDate = new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 1); renderCalendar() };
+    $("newBookingBtn").onclick = () => openBooking(currentResourceId); $("quickBookBtn").onclick = () => openBooking(currentResourceId || resources[0]?.id);
+    function openBooking(resourceId, day = "") { currentResourceId = resourceId || currentResourceId; const r = resourceById(currentResourceId); if (!r) return alert("Lägg först till ett bokningsobjekt."); $("bookingForm").reset(); $("dialogResource").textContent = `${r.icon || "📅"} ${r.name}`; $("formError").textContent = ""; const t = iso(new Date()), chosen = day || t; $("startDate").min = t; $("endDate").min = t; $("startDate").value = chosen; $("endDate").value = chosen; $("bookingDialog").showModal() }
+    $("startDate").onchange = () => { $("endDate").min = $("startDate").value; if (!$("endDate").value || $("endDate").value < $("startDate").value) $("endDate").value = $("startDate").value };
+    $("bookingForm").onsubmit = async e => {
+      e.preventDefault(); const start = $("startDate").value, end = $("endDate").value, comment = $("comment").value.trim(), r = resourceById(currentResourceId);
+      if (!start || !end || end < start) { $("formError").textContent = "Kontrollera datumen."; return }
+      $("formError").textContent = "Sparar…"; const bookingRef = doc(collection(db, "bookings")), ds = dates(start, end);
+      try {
+        await runTransaction(db, async tx => {
+          const refs = ds.map(d => doc(db, "bookingLocks", `${currentResourceId}__${d}`)); const snaps = [];
+          for (const ref of refs) snaps.push(await tx.get(ref)); if (snaps.some(s => s.exists())) throw new Error("DUBBEL");
+          tx.set(bookingRef, { resourceId: currentResourceId, resource: r.name, start, end, comment, userId: user.uid, userEmail: user.email, displayName: profile?.displayName || "Christin", createdAt: serverTimestamp() });
+          refs.forEach((ref, i) => tx.set(ref, { bookingId: bookingRef.id, resourceId: currentResourceId, date: ds[i], userId: user.uid }));
+        }); $("bookingDialog").close()
+      } catch (x) { $("formError").textContent = x.message === "DUBBEL" ? "Något av datumen är redan bokat." : errText(x) }
+    };
+    async function removeBooking(id) {
+      const b = bookings.find(x => x.id === id); if (!b || (!isAdmin() && b.userId !== user.uid) || !confirm("Vill du ta bort bokningen?")) return;
+      try {
+        await runTransaction(db, async tx => {
+          const lockRefs = dates(b.start, b.end).map(d => doc(db, "bookingLocks", `${b.resourceId || slug(b.resource)}__${d}`)); const snaps = [];
+          for (const ref of lockRefs) snaps.push(await tx.get(ref)); tx.delete(doc(db, "bookings", id));
+          snaps.forEach((s, i) => { if (s.exists() && s.data().bookingId === id) tx.delete(lockRefs[i]) });
+        })
+      } catch (x) { alert(errText(x)) }
+    }
+    $("profileForm").onsubmit = async e => { e.preventDefault(); const name = $("displayNameInput").value.trim(); if (!name) return; try { await setDoc(doc(db, "profiles", user.uid), { displayName: name, email: user.email, updatedAt: serverTimestamp() }, { merge: true }); profile = { ...profile, displayName: name }; $("welcomeName").textContent = name; $("profileMsg").textContent = "Sparat."; renderAll() } catch (x) { $("profileMsg").textContent = errText(x) } };
+    $("addResourceBtn").onclick = () => openResourceDialog(); $("addResourceTop").onclick = () => openResourceDialog();
+    function openResourceDialog(id = "") {
+      if (!isAdmin()) return; const r = allResources.find(x => x.id === id); $("resourceForm").reset(); $("resourceId").value = id; $("resourceDialogTitle").textContent = r ? "Ändra objekt" : "Lägg till objekt"; $("resourceName").value = r?.name || ""; $("resourceIcon").value = r?.icon || "📅"; $("resourceColor").value = r?.color || "#155e4b"; $("resourceDescription").value = r?.description || ""; $("resourceError").textContent = ""; $("resourceDialog").showModal()
+    }
+    $("resourceForm").onsubmit = async e => { e.preventDefault(); if (!isAdmin()) return; const existing = $("resourceId").value, name = $("resourceName").value.trim(), id = existing || slug(name); try { await setDoc(doc(db, "resources", id), { name, icon: $("resourceIcon").value.trim() || "📅", color: $("resourceColor").value, description: $("resourceDescription").value.trim(), active: true, order: resourceById(existing)?.order || resources.length + 1, updatedAt: serverTimestamp(), updatedBy: user.uid }, { merge: true }); $("resourceDialog").close() } catch (x) { $("resourceError").textContent = errText(x) } };
+    async function archiveResource(id) {
+      if (!isAdmin() || !confirm("Vill du arkivera detta bokningsobjekt? Det försvinner från översikten men bokningshistoriken sparas.")) return;
+      try { await setDoc(doc(db, "resources", id), { active: false, updatedAt: serverTimestamp(), updatedBy: user.uid }, { merge: true }) }
+      catch (x) { alert(errText(x)) }
+    }
+    async function restoreResource(id) {
+      if (!isAdmin()) return;
+      try { await setDoc(doc(db, "resources", id), { active: true, updatedAt: serverTimestamp(), updatedBy: user.uid }, { merge: true }) }
+      catch (x) { alert(errText(x)) }
+    }
+    async function deleteResource(id) {
+      if (!isAdmin()) return;
+      const r = allResources.find(x => x.id === id);
+      const linked = bookings.filter(b => bookingResourceId(b) === id);
+      if (linked.length) {
+        alert(`Det går inte att ta bort ${r?.name || "objektet"} eftersom det finns ${linked.length} bokning${linked.length === 1 ? "" : "ar"}. Arkivera objektet i stället.`);
+        return;
+      }
+      if (!confirm(`Är du säker på att du vill ta bort ${r?.name || "detta objekt"} permanent? Detta går inte att ångra.`)) return;
+      try { await deleteDoc(doc(db, "resources", id)) }
+      catch (x) { alert(errText(x)) }
+    }
+    document.querySelectorAll("[data-close]").forEach(x => x.onclick = () => $(x.dataset.close).close());
+    document.querySelectorAll("[data-admin-view]").forEach(btn => btn.onclick = () => {
+      document.querySelectorAll("[data-admin-view]").forEach(x => x.classList.toggle("active", x === btn));
+      document.querySelectorAll(".admin-panel-section").forEach(x => x.classList.remove("active"));
+      const target = { objects: "adminObjects", archived: "adminArchived", info: "adminInfo" }[btn.dataset.adminView];
+      if (target) $(target).classList.add("active");
+    });
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.getRegistrations()
+        .then(items => items.forEach(item => item.unregister()))
+        .catch(() => { });
+    }
+  </script>
 </body>
+
 </html>
