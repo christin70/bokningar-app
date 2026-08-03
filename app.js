@@ -145,9 +145,11 @@ async function restoreResource(id){
   catch(x){alert(errText(x))}
 }
 async function deleteResource(id){
+    
   if(!isAdmin())return;
   const r=allResources.find(x=>x.id===id);
-  const linked=bookings.filter(b=>bookingResourceId(b)===id);
+const linked=bookings.filter(b=>b.resourceId===id);
+
   if(linked.length){
     alert(`Det går inte att ta bort ${r?.name||"objektet"} eftersom det finns ${linked.length} bokning${linked.length===1?"":"ar"}. Arkivera objektet i stället.`);
     return;
