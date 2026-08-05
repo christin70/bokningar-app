@@ -134,6 +134,7 @@ function openResourceDialog(id=""){
   if(!isAdmin())return;const r=allResources.find(x=>x.id===id);$("resourceForm").reset();$("resourceId").value=id;$("resourceDialogTitle").textContent=r?"Ändra objekt":"Lägg till objekt";$("resourceName").value=r?.name||"";$("resourceIcon").value=r?.icon||"📅";$("resourceColor").value=r?.color||"#155e4b";$("resourceDescription").value=r?.description||"";$("resourceError").textContent="";$("resourceDialog").showModal()
 }
 $("resourceForm").onsubmit=async e=>{e.preventDefault();if(!isAdmin())return;const existing=$("resourceId").value,name=$("resourceName").value.trim(),id=existing||slug(name);try{await setDoc(doc(db,"resources",id),{name,icon:$("resourceIcon").value.trim()||"📅",color:$("resourceColor").value,description:$("resourceDescription").value.trim(),active:true,order:resourceById(existing)?.order||resources.length+1,updatedAt:serverTimestamp(),updatedBy:user.uid},{merge:true});$("resourceDialog").close()}catch(x){$("resourceError").textContent=errText(x)}};
+
 async function archiveResource(id){
   if(!isAdmin()||!confirm("Vill du arkivera detta bokningsobjekt? Det försvinner från översikten men bokningshistoriken sparas."))return;
   try{await setDoc(doc(db,"resources",id),{active:false,updatedAt:serverTimestamp(),updatedBy:user.uid},{merge:true})}

@@ -116,6 +116,11 @@ select {
     color: var(--text)
 }
 
+input[type="color"] {
+  padding: 2px;
+  background: transparent;
+}
+
 .primary,
 .ghost,
 .danger {
@@ -588,4 +593,5 @@ dialog form {
 .day.mine {
   box-shadow: inset 0 0 0 2px var(--brand);
 }
-
+.
+}
