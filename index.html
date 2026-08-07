@@ -49,7 +49,16 @@
     <section id="settingsTab" class="tab">
       <div class="card" style="padding:20px;margin-bottom:16px"><h2>Min profil</h2><p>Inloggad som <strong id="settingsUser"></strong></p>
         <form id="profileForm"><label>Visningsnamn<input id="displayNameInput" maxlength="40" required></label><button class="primary" type="submit">Spara namn</button><p id="profileMsg" class="error"></p></form>
-      </div>
+      <div class="password-change">
+  <h3>Byt lösenord</h3>
+  <form id="passwordForm">
+    <label>Nytt lösenord
+      <input id="newPasswordInput" type="password" minlength="6" autocomplete="new-password" required>
+    </label>
+    <button class="primary" type="submit">Byt lösenord</button>
+    <p id="passwordMessage" class="muted"></p>
+  </form>
+</div></div>
       <div id="adminSection" class="hidden">
         <div class="section-head"><h2>Administration</h2></div>
         <div class="admin-menu">

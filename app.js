@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
-import { getAuth,onAuthStateChanged,signInWithEmailAndPassword,signOut } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
+import { getAuth,onAuthStateChanged,signInWithEmailAndPassword, updatePassword, signOut } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
 import { getFirestore,collection,doc,getDoc,setDoc,onSnapshot,runTransaction,serverTimestamp,deleteDoc,writeBatch } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
 const firebaseConfig={apiKey:"AIzaSyBeucnfeFb9awrRv8ziTmQZxBpMWF4OhpY",authDomain:"bokningar-deb17.firebaseapp.com",projectId:"bokningar-deb17",storageBucket:"bokningar-deb17.firebasestorage.app",messagingSenderId:"964863988500",appId:"1:964863988500:web:fe26f729eb390dcf676801",measurementId:"G-BH8Z38DDD9"};
@@ -129,6 +129,21 @@ async function removeBooking(id){
   })}catch(x){alert(errText(x))}
 }
 $("profileForm").onsubmit=async e=>{e.preventDefault();const name=$("displayNameInput").value.trim();if(!name)return;try{await setDoc(doc(db,"profiles",user.uid),{displayName:name,email:user.email,updatedAt:serverTimestamp()},{merge:true});profile={...profile,displayName:name};$("welcomeName").textContent=name;$("profileMsg").textContent="Sparat.";renderAll()}catch(x){$("profileMsg").textContent=errText(x)}};
+$("passwordForm").onsubmit = async e => {
+  e.preventDefault();
+  const newPassword = $("newPasswordInput").value;
+  const message = $("passwordMessage");
+
+  message.textContent = "";
+
+  try {
+    await updatePassword(user, newPassword);
+    message.textContent = "Lösenordet är ändrat.";
+    $("passwordForm").reset();
+  } catch (x) {
+    message.textContent = errText(x);
+  }
+};
 $("addResourceBtn").onclick=()=>openResourceDialog();$("addResourceTop").onclick=()=>openResourceDialog();
 function openResourceDialog(id=""){
   if(!isAdmin())return;const r=allResources.find(x=>x.id===id);$("resourceForm").reset();$("resourceId").value=id;$("resourceDialogTitle").textContent=r?"Ändra objekt":"Lägg till objekt";$("resourceName").value=r?.name||"";$("resourceIcon").value=r?.icon||"📅";$("resourceColor").value=r?.color||"#155e4b";$("resourceDescription").value=r?.description||"";$("resourceError").textContent="";$("resourceDialog").showModal()
@@ -139,7 +154,7 @@ async function archiveResource(id){
   if(!isAdmin()||!confirm("Vill du arkivera detta bokningsobjekt? Det försvinner från översikten men bokningshistoriken sparas."))return;
   try{await setDoc(doc(db,"resources",id),{active:false,updatedAt:serverTimestamp(),updatedBy:user.uid},{merge:true})}
   catch(x){alert(errText(x))}
-}
+}xf
 async function restoreResource(id){
   if(!isAdmin())return;
   try{await setDoc(doc(db,"resources",id),{active:true,updatedAt:serverTimestamp(),updatedBy:user.uid},{merge:true})}
