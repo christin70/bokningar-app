@@ -98,7 +98,7 @@
 </div>
 
 <dialog id="bookingDialog"><form id="bookingForm" method="dialog">
-  <div class="dialog-head"><div><p class="eyebrow">Ny bokning</p><h2 id="dialogResource"></h2></div><button type="button" class="ghost" data-close="bookingDialog">✕</button></div>
+  <div class="dialog-head"><div><p class="eyebrow">Ny bokning</p><h2 id="dialogResource"></h2></div><button type="button" class="ghost" data-close="bookingDialog" onclick="document.getElementById('bookingDialog').close()">✕</button></div>
   <label>Från<input id="startDate" type="date" required></label><label>Till<input id="endDate" type="date" required></label>
   <label>Kommentar<textarea id="comment" rows="3" placeholder="Valfritt"></textarea></label><p id="formError" class="error"></p><button class="primary" type="submit">Spara bokning</button>
 </form></dialog>

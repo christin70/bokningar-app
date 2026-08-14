@@ -594,3 +594,21 @@ dialog form {
   box-shadow: inset 0 0 0 2px var(--brand);
 }
 
+.week-number {
+  position: absolute;
+  top: 5px;
+  right: 7px;
+  left: auto;
+  font-size: 10px;
+  font-weight: 700;
+  opacity: 0.6;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  pointer-events: none;
+}.day strong {
+  display: block;
+}.day-number {
+  position: absolute;
+  top: 7px;
+  left: 7px;
+}
