@@ -111,8 +111,10 @@ function renderCalendar(){
   }
   $("calendarGrid").innerHTML=h;document.querySelectorAll("[data-day]").forEach(x=>x.onclick=()=>{const dt=x.dataset.day,b=bookings.find(v=>v.resourceId===currentResourceId&&dt>=v.start&&dt<=v.end);if(b)alert(`${displayNameFor(b)} har bokat ${fmt(b.start)}–${fmt(b.end)}${b.comment?`\n${b.comment}`:""}`);else openBooking(currentResourceId,dt)});
 }
-$("prevMonth").onclick=()=>{viewDate=new Date(viewDate.getFullYear(),viewDate.getMonth()-1,1);renderCalendar()};
-$("nextMonth").onclick=()=>{viewDate=new Date(viewDate.getFullYear(),viewDate.getMonth()+1,1);renderCalendar()};
+$("prevMonth").onclick=()=>{viewDate=new Date(viewDate.getFullYear(),viewDate.getMonth()-1,1);renderCalendar();renderOverviewCalendar()};
+$("nextMonth").onclick=()=>{viewDate=new Date(viewDate.getFullYear(),viewDate.getMonth()+1,1);renderCalendar();renderOverviewCalendar()};
+$("overviewPrevMonth").onclick=()=>{viewDate=new Date(viewDate.getFullYear(),viewDate.getMonth()-1,1);renderCalendar();renderOverviewCalendar()};
+$("overviewNextMonth").onclick=()=>{viewDate=new Date(viewDate.getFullYear(),viewDate.getMonth()+1,1);renderCalendar();renderOverviewCalendar()};
 $("newBookingBtn").onclick=()=>openBooking(currentResourceId);$("quickBookBtn").onclick=()=>openBooking(currentResourceId||resources[0]?.id);
 function openBooking(resourceId,day=""){currentResourceId=resourceId||currentResourceId;const r=resourceById(currentResourceId);if(!r)return alert("Lägg först till ett bokningsobjekt.");$("bookingForm").reset();$("dialogResource").textContent=`${r.icon||"📅"} ${r.name}`;$("formError").textContent="";const t=iso(new Date()),chosen=day||t;$("startDate").min=t;$("endDate").min=t;$("startDate").value=chosen;$("endDate").value=chosen;$("bookingDialog").showModal()}
 $("startDate").onchange=()=>{$("endDate").min=$("startDate").value;if(!$("endDate").value||$("endDate").value<$("startDate").value)$("endDate").value=$("startDate").value};
@@ -197,6 +199,7 @@ document.querySelectorAll("[data-admin-view]").forEach(btn=>btn.onclick=()=>{
 function renderOverviewCalendar(){
   const el = $("overviewCalendar");
   if(!el) return;
+ $("overviewMonthLabel").textContent=viewDate.toLocaleDateString("sv-SE",{month:"long",year:"numeric"}); 
 
   const y = viewDate.getFullYear();
   const m = viewDate.getMonth();
