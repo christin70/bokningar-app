@@ -107,7 +107,7 @@ function renderCalendar(){
   $("monthLabel").textContent=viewDate.toLocaleDateString("sv-SE",{month:"long",year:"numeric"});let h="";
   for(let i=0;i<off;i++)h+='<div class="day empty"></div>';
   for(let d=1;d<=n;d++){const dt=iso(new Date(y,m,d,12)),b=bookings.find(x=>x.resourceId===currentResourceId&&dt>=x.start&&dt<=x.end),mine=b?.userId===user?.uid;
-    h+=`<div class="day ${b?"busy":""} ${mine?"mine":""} ${dt===today?"today":""}"><strong>${d}</strong>${b?`<small>${esc(displayNameFor(b))}</small>`:""}<button aria-label="${b?"Bokad "+displayNameFor(b):"Boka "+dt}" data-day="${dt}"></button></div>`;
+    h+=`<div class="day ${b?"busy":""} ${mine?"mine":""} ${dt===today?"today":""}"><strong>${d}</strong>${((off+d-1)%7===0)?`<span class="week-number">v. ${weekNumber(new Date(y,m,d,12))}</span>`:""}${b?`<small>${esc(displayNameFor(b))}</small>`:""}<button aria-label="${b?"Bokad "+displayNameFor(b):"Boka "+dt}" data-day="${dt}"></button></div>`;
   }
   $("calendarGrid").innerHTML=h;document.querySelectorAll("[data-day]").forEach(x=>x.onclick=()=>{const dt=x.dataset.day,b=bookings.find(v=>v.resourceId===currentResourceId&&dt>=v.start&&dt<=v.end);if(b)alert(`${displayNameFor(b)} har bokat ${fmt(b.start)}–${fmt(b.end)}${b.comment?`\n${b.comment}`:""}`);else openBooking(currentResourceId,dt)});
 }
@@ -187,7 +187,13 @@ document.querySelectorAll("[data-admin-view]").forEach(btn=>btn.onclick=()=>{
   document.querySelectorAll(".admin-panel-section").forEach(x=>x.classList.remove("active"));
   const target={objects:"adminObjects",archived:"adminArchived",info:"adminInfo"}[btn.dataset.adminView];
   if(target)$(target).classList.add("active");
-});
+});function overviewWeekNumber(d){
+  const date = new Date(d);
+  date.setHours(0,0,0,0);
+  date.setDate(date.getDate() + 4 - (date.getDay() || 7));
+  const yearStart = new Date(date.getFullYear(), 0, 1);
+  return Math.ceil((((date - yearStart) / 86400000) + 1) / 7);
+}
 function renderOverviewCalendar(){
   const el = $("overviewCalendar");
   if(!el) return;
@@ -210,10 +216,10 @@ function renderOverviewCalendar(){
   for(let d=1;d<=n;d++){
    const dt = iso(new Date(y,m,d,12));
     const dayBookings = bookings.filter(b => dt >= b.start && dt <= b.end);
-
+   
     h += `<div class="day">
-      <strong>${d}</strong>`;
-
+    <strong>${d}</strong>
+${((off + d - 1) % 7 === 0) ? `<span class="week-number">v. ${overviewWeekNumber(new Date(y,m,d,12))}</span>` : ""}`; 
     dayBookings.forEach(b=>{
       const r = resourceById(b.resourceId);
       h += `<small class="overview-booking">
