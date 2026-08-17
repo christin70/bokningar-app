@@ -83,7 +83,7 @@ function renderAll(){
   $("resourceAdminList").innerHTML=resources.length?resources.map(x=>`<div class="card admin-row"><div><strong>${esc(x.icon||"📅")} ${esc(x.name)}</strong><div class="muted">${esc(x.description||"")}</div></div><div class="admin-actions"><button class="ghost" data-edit-resource="${x.id}">Ändra</button><button class="ghost" data-archive-resource="${x.id}">Arkivera</button><button class="danger" data-delete-resource="${x.id}">Ta bort</button></div></div>`).join(""):'<div class="card muted" style="padding:16px">Inga aktiva objekt.</div>';
   const archived=allResources.filter(x=>x.active===false);
   $("archivedResourceList").innerHTML=archived.length?archived.map(x=>`<div class="card admin-row"><div><strong>${esc(x.icon||"📅")} ${esc(x.name)}</strong><div class="muted">${esc(x.description||"")}</div></div><div class="admin-actions"><button class="primary" data-restore-resource="${x.id}">Återställ</button><button class="danger" data-delete-resource="${x.id}">Ta bort</button></div></div>`).join(""):'<div class="card muted" style="padding:16px">Inga arkiverade objekt.</div>';
-  bindActions();renderCalendar();
+  bindActions();renderCalendar();renderOverviewCalendar();
 }
 function bindActions(){
   document.querySelectorAll("[data-open-cal]").forEach(x=>x.onclick=()=>{currentResourceId=x.dataset.openCal;showTab("calendar")});
@@ -96,6 +96,13 @@ function bindActions(){
   document.querySelectorAll("[data-restore-resource]").forEach(x=>x.onclick=()=>restoreResource(x.dataset.restoreResource));
 }
 function renderCalendar(){
+ const weekNumber = d => {
+  const date = new Date(d);
+  date.setHours(0,0,0,0);
+  date.setDate(date.getDate() + 4 - (date.getDay() || 7));
+  const yearStart = new Date(date.getFullYear(), 0, 1);
+  return Math.ceil((((date - yearStart) / 86400000) + 1) / 7);
+}; 
   const y=viewDate.getFullYear(),m=viewDate.getMonth(),off=(new Date(y,m,1).getDay()+6)%7,n=new Date(y,m+1,0).getDate(),today=iso(new Date());
   $("monthLabel").textContent=viewDate.toLocaleDateString("sv-SE",{month:"long",year:"numeric"});let h="";
   for(let i=0;i<off;i++)h+='<div class="day empty"></div>';
@@ -181,6 +188,45 @@ document.querySelectorAll("[data-admin-view]").forEach(btn=>btn.onclick=()=>{
   const target={objects:"adminObjects",archived:"adminArchived",info:"adminInfo"}[btn.dataset.adminView];
   if(target)$(target).classList.add("active");
 });
+function renderOverviewCalendar(){
+  const el = $("overviewCalendar");
+  if(!el) return;
+
+  const y = viewDate.getFullYear();
+  const m = viewDate.getMonth();
+  const off = (new Date(y,m,1).getDay()+6)%7;
+  const n = new Date(y,m+1,0).getDate();
+
+  let h = `<div class="calendar-card">
+    <h3>${viewDate.toLocaleDateString("sv-SE",{month:"long",year:"numeric"})}</h3>
+    <div class="weekdays">
+      <div>Mån</div><div>Tis</div><div>Ons</div><div>Tor</div>
+      <div>Fre</div><div>Lör</div><div>Sön</div>
+    </div>
+    <div class="calendar-grid">`;
+
+  let cellIndex = off;for(let i=0;i<off;i++) h += `<div class="day empty"></div>`;
+
+  for(let d=1;d<=n;d++){
+   const dt = iso(new Date(y,m,d,12));
+    const dayBookings = bookings.filter(b => dt >= b.start && dt <= b.end);
+
+    h += `<div class="day">
+      <strong>${d}</strong>`;
+
+    dayBookings.forEach(b=>{
+      const r = resourceById(b.resourceId);
+      h += `<small class="overview-booking">
+        ${esc(r?.icon || "📌")} ${esc(displayNameFor(b))}
+      </small>`;
+    });
+
+    h += `</div>`;
+  }
+
+  h += `</div></div>`;
+  el.innerHTML = h;
+}
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.getRegistrations()
     .then(items => items.forEach(item => item.unregister()))
