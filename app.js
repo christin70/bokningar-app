@@ -75,7 +75,7 @@ function renderAll(){
   if(!user)return;
   document.querySelectorAll(".admin-only").forEach(x=>x.classList.toggle("hidden",!isAdmin()));$("adminSection").classList.toggle("hidden",!isAdmin());
   $("resourceGrid").innerHTML=resources.length?resources.map(resourceCard).join(""):'<div class="card" style="padding:18px">Inga bokningsobjekt ännu.</div>';
-  const today=iso(new Date()),up=bookings.filter(b=>b.end>=today).slice(0,12);$("upcomingList").innerHTML=up.length?up.map(bookingCard).join(""):'<div class="card muted" style="padding:18px">Inga kommande bokningar.</div>';
+$("upcomingList").innerHTML = "";
   if(currentResourceId&&!resourceById(currentResourceId)&&resources.length)currentResourceId=resources[0].id;
   const r=resourceById(currentResourceId);$("resourceTitle").textContent=r?`${r.icon||"📅"} ${r.name}`:"Kalender";
   $("resourcePills").innerHTML=resources.map(x=>`<button class="pill ${x.id===currentResourceId?"active":""}" data-resource="${x.id}">${esc(x.icon||"📅")} ${esc(x.name)}</button>`).join("");
@@ -105,11 +105,25 @@ function renderCalendar(){
 }; 
   const y=viewDate.getFullYear(),m=viewDate.getMonth(),off=(new Date(y,m,1).getDay()+6)%7,n=new Date(y,m+1,0).getDate(),today=iso(new Date());
   $("monthLabel").textContent=viewDate.toLocaleDateString("sv-SE",{month:"long",year:"numeric"});let h="";
-  for(let i=0;i<off;i++)h+='<div class="day empty"></div>';
-  for(let d=1;d<=n;d++){const dt=iso(new Date(y,m,d,12)),b=bookings.find(x=>x.resourceId===currentResourceId&&dt>=x.start&&dt<=x.end),mine=b?.userId===user?.uid;
-    h+=`<div class="day ${b?"busy":""} ${mine?"mine":""} ${dt===today?"today":""}"><strong>${d}</strong>${((off+d-1)%7===0)?`<span class="week-number">v. ${weekNumber(new Date(y,m,d,12))}</span>`:""}${b?`<small>${esc(displayNameFor(b))}</small>`:""}<button aria-label="${b?"Bokad "+displayNameFor(b):"Boka "+dt}" data-day="${dt}"></button></div>`;
-  }
-  $("calendarGrid").innerHTML=h;document.querySelectorAll("[data-day]").forEach(x=>x.onclick=()=>{const dt=x.dataset.day,b=bookings.find(v=>v.resourceId===currentResourceId&&dt>=v.start&&dt<=v.end);if(b)alert(`${displayNameFor(b)} har bokat ${fmt(b.start)}–${fmt(b.end)}${b.comment?`\n${b.comment}`:""}`);else openBooking(currentResourceId,dt)});
+for(let i=0;i<off;i++){
+  h+=`<div class="day empty"></div>`;
+}
+
+for(let d=1;d<=n;d++){
+  const dt=iso(new Date(y,m,d,12));
+  const b=bookings.find(x=>x.resourceId===currentResourceId&&dt>=x.start&&dt<=x.end);
+  const mine=b?.userId===user?.uid;
+
+ if(d!==1 && (off+d-1)%7===0){ 
+  h+=`<div class="week-cell">v. ${weekNumber(new Date(y,m,d,12))}</div>`;
+}
+
+h+=`<div class="day ${b?"busy":""} ${mine?"mine":""} ${dt===today?"today":""}">
+  <strong>${d}</strong>
+  ${b?`<small>${esc(displayNameFor(b))}</small>`:""}
+  <button aria-label="${b?"Bokad "+displayNameFor(b):"Boka "+dt}" data-day="${dt}"></button>
+</div>`;
+  }$("calendarGrid").innerHTML=h;document.querySelectorAll("[data-day]").forEach(x=>x.onclick=()=>{const dt=x.dataset.day,b=bookings.find(v=>v.resourceId===currentResourceId&&dt>=v.start&&dt<=v.end);if(b)alert(`${displayNameFor(b)} har bokat ${fmt(b.start)}–${fmt(b.end)}${b.comment?`\n${b.comment}`:""}`);else openBooking(currentResourceId,dt)});
 }
 $("prevMonth").onclick=()=>{viewDate=new Date(viewDate.getFullYear(),viewDate.getMonth()-1,1);renderCalendar();renderOverviewCalendar()};
 $("nextMonth").onclick=()=>{viewDate=new Date(viewDate.getFullYear(),viewDate.getMonth()+1,1);renderCalendar();renderOverviewCalendar()};
@@ -207,22 +221,32 @@ function renderOverviewCalendar(){
   const n = new Date(y,m+1,0).getDate();
 
   let h = `<div class="calendar-card">
-    <h3>${viewDate.toLocaleDateString("sv-SE",{month:"long",year:"numeric"})}</h3>
+    
     <div class="weekdays">
-      <div>Mån</div><div>Tis</div><div>Ons</div><div>Tor</div>
+      <div>v.</div><div>Mån</div><div>Tis</div><div>Ons</div><div>Tor</div>
       <div>Fre</div><div>Lör</div><div>Sön</div>
     </div>
     <div class="calendar-grid">`;
 
-  let cellIndex = off;for(let i=0;i<off;i++) h += `<div class="day empty"></div>`;
+  let gridPos = off;
 
-  for(let d=1;d<=n;d++){
+h += `<div class="week-cell"></div>`;
+
+for(let i=0;i<off;i++){
+  h += `<div class="day empty"></div>`;
+}
+
+for(let d=1;d<=n;d++){
+  if(gridPos === 7){
+    gridPos = 0;
+    h += `<div class="week-cell">v. ${overviewWeekNumber(new Date(y,m,d,12))}</div>`;
+  }
    const dt = iso(new Date(y,m,d,12));
     const dayBookings = bookings.filter(b => dt >= b.start && dt <= b.end);
    
     h += `<div class="day">
     <strong>${d}</strong>
-${((off + d - 1) % 7 === 0) ? `<span class="week-number">v. ${overviewWeekNumber(new Date(y,m,d,12))}</span>` : ""}`; 
+`;
     dayBookings.forEach(b=>{
       const r = resourceById(b.resourceId);
       h += `<small class="overview-booking">
@@ -231,6 +255,8 @@ ${((off + d - 1) % 7 === 0) ? `<span class="week-number">v. ${overviewWeekNumber
     });
 
     h += `</div>`;
+    gridPos++;
+
   }
 
   h += `</div></div>`;
