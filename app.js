@@ -105,18 +105,20 @@ function renderCalendar(){
 }; 
   const y=viewDate.getFullYear(),m=viewDate.getMonth(),off=(new Date(y,m,1).getDay()+6)%7,n=new Date(y,m+1,0).getDate(),today=iso(new Date());
   $("monthLabel").textContent=viewDate.toLocaleDateString("sv-SE",{month:"long",year:"numeric"});let h="";
-for(let i=0;i<off;i++){
+h+=`<div class="week-cell"></div>`;
+  for(let i=0;i<off;i++){
   h+=`<div class="day empty"></div>`;
 }
 
 for(let d=1;d<=n;d++){
+ if((off+d-1)%7===0){
+  h+=`<div class="week-cell">v. ${weekNumber(new Date(y,m,d,12))}</div>`;
+} 
   const dt=iso(new Date(y,m,d,12));
   const b=bookings.find(x=>x.resourceId===currentResourceId&&dt>=x.start&&dt<=x.end);
   const mine=b?.userId===user?.uid;
 
- if(d!==1 && (off+d-1)%7===0){ 
-  h+=`<div class="week-cell">v. ${weekNumber(new Date(y,m,d,12))}</div>`;
-}
+
 
 h+=`<div class="day ${b?"busy":""} ${mine?"mine":""} ${dt===today?"today":""}">
   <strong>${d}</strong>

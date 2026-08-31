@@ -333,14 +333,17 @@ main {
 }
 
 .day small {
-    display: block;
+    display: none;
+    
     margin-top: 7px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     font-size: 11px
 }
-
+#overviewCalendar .day small {
+    display: block
+}
 .booking-list {
     display: grid;
     gap: 11px;
