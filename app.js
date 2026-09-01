@@ -1,9 +1,12 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
 import { getAuth,onAuthStateChanged,signInWithEmailAndPassword, updatePassword, signOut } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
 import { getFirestore,collection,doc,getDoc,setDoc,onSnapshot,runTransaction,serverTimestamp,deleteDoc,writeBatch } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-messaging.js";
 
 const firebaseConfig={apiKey:"AIzaSyBeucnfeFb9awrRv8ziTmQZxBpMWF4OhpY",authDomain:"bokningar-deb17.firebaseapp.com",projectId:"bokningar-deb17",storageBucket:"bokningar-deb17.firebasestorage.app",messagingSenderId:"964863988500",appId:"1:964863988500:web:fe26f729eb390dcf676801",measurementId:"G-BH8Z38DDD9"};
 const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app);
+const messaging = getMessaging(app);
+const VAPID_KEY = "BKukWtjFZwEC0t69GJHfAAFSjbRQ6kDjysrQ7JgxI79jO6VasixQHr0Fjq_s9OC3rtrv4YtEe-THiO8WTGGwyTQconst VAPID_KEY = ";
 const ADMIN_EMAILS=["barabajen@gmail.com"];
 const DEFAULT_RESOURCES=[
   {id:"bil",name:"Bil",icon:"🚗",color:"#176b57",description:"Familjens bil",order:1,active:true},
@@ -29,6 +32,7 @@ onAuthStateChanged(auth,async u=>{
   $("settingsUser").textContent=u.email;
   await loadProfile();
   listenData();
+ 
   showTab("home");
 });
 async function loadProfile(){
@@ -262,10 +266,26 @@ for(let d=1;d<=n;d++){
   }
 
   h += `</div></div>`;
-  el.innerHTML = h;
+  el.innerHTML = h;if (!token) return;
+
 }
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.getRegistrations()
     .then(items => items.forEach(item => item.unregister()))
     .catch(() => {});
+  async function setupNotifications(){
+if (!("Notification" in window) || !("serviceWorker" in navigator)) return;
+const permission = await Notification.requestPermission(); 
+if (permission !== "granted") return;
+const registration = await navigator.serviceWorker.ready;
+const token = await getToken(messaging, { vapidKey: VAPID_KEY, serviceWorkerRegistration: registration });
+await setDoc(doc(db, "pushTokens", user.uid), { token }, { merge: true });
+}
+$("enableNotificationsBtn")?.addEventListener("click", setupNotifications);
+
+
+
+
+ 
+    
 }
