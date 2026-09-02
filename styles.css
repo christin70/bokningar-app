@@ -287,7 +287,8 @@ main {
 .weekdays,
 .calendar-grid {
     display: grid;
- grid-template-columns: 42px repeat(7, 1fr);  
+ grid-template-columns: 42px repeat(7, minmax(0, 1fr));
+ 
     gap: 6px
 }
 
