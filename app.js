@@ -278,7 +278,7 @@ const registration = await navigator.serviceWorker.ready;
 const token = await getToken(messaging, { vapidKey: VAPID_KEY, serviceWorkerRegistration: registration });
 await setDoc(doc(db, "pushTokens", user.uid), { token }, { merge: true });
 }
-alert("Knappen fungerar");
+
 $("enableNotificationsBtn")?.addEventListener("click", setupNotifications);
 
 
