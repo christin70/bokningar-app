@@ -183,7 +183,7 @@ async function archiveResource(id){
   if(!isAdmin()||!confirm("Vill du arkivera detta bokningsobjekt? Det försvinner från översikten men bokningshistoriken sparas."))return;
   try{await setDoc(doc(db,"resources",id),{active:false,updatedAt:serverTimestamp(),updatedBy:user.uid},{merge:true})}
   catch(x){alert(errText(x))}
-}xf
+}
 async function restoreResource(id){
   if(!isAdmin())return;
   try{await setDoc(doc(db,"resources",id),{active:true,updatedAt:serverTimestamp(),updatedBy:user.uid},{merge:true})}
@@ -266,7 +266,7 @@ for(let d=1;d<=n;d++){
   }
 
   h += `</div></div>`;
-  el.innerHTML = h;if (!token) return;
+  el.innerHTML = h;
 
 }
 
