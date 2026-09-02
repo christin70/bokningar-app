@@ -269,10 +269,7 @@ for(let d=1;d<=n;d++){
   el.innerHTML = h;if (!token) return;
 
 }
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.getRegistrations()
-    .then(items => items.forEach(item => item.unregister()))
-    .catch(() => {});
+
   async function setupNotifications(){
 if (!("Notification" in window) || !("serviceWorker" in navigator)) return;
 const permission = await Notification.requestPermission(); 
@@ -288,4 +285,4 @@ $("enableNotificationsBtn")?.addEventListener("click", setupNotifications);
 
  
     
-}
+
