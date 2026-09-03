@@ -6,7 +6,7 @@ import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/fireb
 const firebaseConfig={apiKey:"AIzaSyBeucnfeFb9awrRv8ziTmQZxBpMWF4OhpY",authDomain:"bokningar-deb17.firebaseapp.com",projectId:"bokningar-deb17",storageBucket:"bokningar-deb17.firebasestorage.app",messagingSenderId:"964863988500",appId:"1:964863988500:web:fe26f729eb390dcf676801",measurementId:"G-BH8Z38DDD9"};
 const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app);
 const messaging = getMessaging(app);
-const VAPID_KEY = "BKukWtjFZwEC0t69GJHfAAFSjbRQ6kDjysrQ7JgxI79jO6VasixQHr0Fjq_s9OC3rtrv4YtEe-THiO8WTGGwyTQconst VAPID_KEY = ";
+const VAPID_KEY = "BKukWtjFZwEC0t69GJHfAAFSjbRQ6kDjysrQ7JgxI79jO6VasixQHr0Fjq_s9OC3rtrv4YtEe-THiO8WTGGwyTQ";
 const ADMIN_EMAILS=["barabajen@gmail.com"];
 const DEFAULT_RESOURCES=[
   {id:"bil",name:"Bil",icon:"🚗",color:"#176b57",description:"Familjens bil",order:1,active:true},
