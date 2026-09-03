@@ -269,7 +269,7 @@ for(let d=1;d<=n;d++){
   el.innerHTML = h;
 
 }
-
+const VAPID_KEY = "BKukWtjFZwEC0t69GJHfAAFSjbRQ6kDjysrQ7JgxI79jO6VasixQHr0Fjq_s9OC3rtrv4YtEe-THiO8WTGGwyTQ";
   async function setupNotifications(){
 if (!("Notification" in window) || !("serviceWorker" in navigator)) return;
 const permission = await Notification.requestPermission(); 
