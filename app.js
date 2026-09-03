@@ -280,7 +280,9 @@ await setDoc(doc(db, "pushTokens", user.uid), { token }, { merge: true });
 }
 
 $("enableNotificationsBtn")?.addEventListener("click", setupNotifications);
-
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("./sw.js");
+}
 
 
 
