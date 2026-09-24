@@ -1,4 +1,17 @@
-const CACHE="bokningar-v2-3";
+importScripts("https://www.gstatic.com/firebasejs/12.16.0/firebase-app-compat.js");
+importScripts("https://www.gstatic.com/firebasejs/12.16.0/firebase-messaging-compat.js");
+firebase.initializeApp({
+  apiKey: "AIzaSyBeucnfefb9awrRv8ziTmqZxBpMWF40hpY",
+  authDomain: "bokningar-deb17.firebaseapp.com",
+  projectId: "bokningar-deb17",
+  storageBucket: "bokningar-deb17.firebasestorage.app",
+  messagingSenderId: "964863988500",
+  appId: "1:964863988500:web:fe26f729eb390dcf676801"
+});
+
+
+const messaging = firebase.messaging()
+;const CACHE="bokningar-v2-3";
 const ASSETS=["./","./index.html","./manifest.webmanifest","./icon.svg"];
 self.addEventListener("install",e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS))));
 self.addEventListener("activate",e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k))))));
