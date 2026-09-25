@@ -10,7 +10,10 @@ firebase.initializeApp({
 });
 
 
-const messaging = firebase.messaging()
+const messaging = firebase.messaging();
+messaging.onBackgroundMessage((payload) => {
+  console.log("Firebase bakgrundsmeddelande:", payload);
+});
 ;const CACHE="bokningar-v2-3";
 const ASSETS=["./","./index.html","./manifest.webmanifest","./icon.svg"];
 self.addEventListener("install",e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS))));
