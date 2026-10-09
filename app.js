@@ -147,7 +147,28 @@ $("bookingForm").onsubmit=async e=>{
     for(const ref of refs)snaps.push(await tx.get(ref));if(snaps.some(s=>s.exists()))throw new Error("DUBBEL");
     tx.set(bookingRef,{resourceId:currentResourceId,resource:r.name,start,end,comment,userId:user.uid,userEmail:user.email,displayName:profile?.displayName||"Christin",createdAt:serverTimestamp()});
     refs.forEach((ref,i)=>tx.set(ref,{bookingId:bookingRef.id,resourceId:currentResourceId,date:ds[i],userId:user.uid}));
-  });$("bookingDialog").close()}catch(x){$("formError").textContent=x.message==="DUBBEL"?"Något av datumen är redan bokat.":errText(x)}
+  });
+
+try {
+  const idToken = await user.getIdToken();
+
+  const response = await fetch("/.netlify/functions/send-notification", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${idToken}`
+    },
+    body: JSON.stringify({ bookingId: bookingRef.id })
+  });
+
+  if (!response.ok) {
+    console.error("Pushnotisen kunde inte skickas");
+  }
+} catch (notificationError) {
+  console.error("Fel vid pushnotis:", notificationError);
+}
+
+$("bookingDialog").close()}catch(x){$("formError").textContent=x.message==="DUBBEL"?"Något av datumen är redan bokat.":errText(x)}
 };
 async function removeBooking(id){
   const b=bookings.find(x=>x.id===id);if(!b||(!isAdmin()&&b.userId!==user.uid)||!confirm("Vill du ta bort bokningen?"))return;
@@ -277,7 +298,7 @@ if (permission !== "granted") return;
 const registration = await navigator.serviceWorker.ready;
 
 const token = await getToken(messaging, { vapidKey: VAPID_KEY, serviceWorkerRegistration: registration });
-console.log("FCM TOKEN SKAPAD:", token);
+
 await setDoc(doc(db, "pushTokens", user.uid), { token }, { merge: true });
 }
 
