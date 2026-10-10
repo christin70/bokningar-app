@@ -1,7 +1,7 @@
 const admin = require("firebase-admin");
 
 function getFirebaseAdmin() {
-  if (!admin.apps.length) {
+  if (!admin.getApps().length) {
     const serviceAccount = JSON.parse(
       process.env.FIREBASE_SERVICE_ACCOUNT
     );
