@@ -1,5 +1,7 @@
-const admin = require("firebase-admin");
-
+const admin = require("firebase-admin/app");
+const { getAuth } = require("firebase-admin/auth");
+const { getFirestore, FieldValue } = require("firebase-admin/firestore");
+const { getMessaging } = require("firebase-admin/messaging");
 function getFirebaseAdmin() {
   if (!admin.getApps().length) {
     const serviceAccount = JSON.parse(
@@ -7,7 +9,7 @@ function getFirebaseAdmin() {
     );
 
     admin.initializeApp({
-      credential: admin.credential.cert(serviceAccount),
+  credential: admin.cert(serviceAccount),
     });
   }
 
@@ -24,7 +26,7 @@ exports.handler = async function (event) {
 
   try {
     const firebase = getFirebaseAdmin();
-
+const adminAuth = getAuth(firebase);
     const authorization =
       event.headers.authorization ||
       event.headers.Authorization ||
@@ -37,7 +39,7 @@ exports.handler = async function (event) {
       };
     }
 
-    const decoded = await firebase.auth().verifyIdToken(
+    const decoded = await adminAuth.verifyIdToken(
       authorization.slice(7)
     );
 
@@ -50,7 +52,7 @@ exports.handler = async function (event) {
       };
     }
 
-    const db = firebase.firestore();
+    const db = getFirestore(firebase);
     const bookingSnap = await db
       .collection("bookings")
       .doc(bookingId)
@@ -83,7 +85,7 @@ exports.handler = async function (event) {
 
       tx.create(notificationRef, {
         bookingId,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        createdAt: FieldValue.serverTimestamp(),
       });
 
       return true;
@@ -122,7 +124,7 @@ exports.handler = async function (event) {
     const title = "Ny bokning i Familjebokningar";
     const body = `${booking.displayName || "Någon"} har gjort en bokning.`;
 
-    const result = await firebase.messaging().sendEachForMulticast({
+    const result = await getMessaging(firebase).sendEachForMulticast({
       tokens: [...new Set(tokens)],
       notification: { title, body },
       webpush: {
