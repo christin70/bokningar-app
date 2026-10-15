@@ -13,7 +13,7 @@ function getFirebaseAdmin() {
     });
   }
 
-  return admin;
+  return admin.getApp();
 }
 
 exports.handler = async function (event) {
