@@ -162,7 +162,7 @@ try {
   });
 
   if (!response.ok) {
-    console.error("Pushnotisen kunde inte skickas");
+    console.error("Pushnotisen kunde inte skickas. Status:", response.status, "Svar:", await response.text());
   }
 } catch (notificationError) {
   console.error("Fel vid pushnotis:", notificationError);
