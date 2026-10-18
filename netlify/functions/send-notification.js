@@ -126,7 +126,7 @@ const adminAuth = getAuth(firebase);
 
     const result = await getMessaging(firebase).sendEachForMulticast({
       tokens: [...new Set(tokens)],
-      notification: { title, body },
+      data: { title, body },
       
     });
 

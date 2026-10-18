@@ -39,9 +39,9 @@ self.addEventListener("fetch", e => {
 });
 self.addEventListener("push", e => {
 const data = e.data ? e.data.json() : {}; 
-const title = data.notification?.title || "Familjebokningar";
+const title = data.data?.title || "Familjebokningar";
 const options = {
-body: data.notification?.body || "En ny bokning har gjorts.",
+body: data.data?.body || "En ny bokning har gjorts.",
 icon: "./apple-touch-icon.png",
 badge: "./apple-touch-icon.png"
 };
