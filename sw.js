@@ -39,7 +39,6 @@ self.addEventListener("fetch", e => {
 });
 self.addEventListener("push", e => {
 const data = e.data ? e.data.json() : {}; 
-if (!data.notification?.title || !data.notification?.body) return;
 const title = data.notification?.title || "Familjebokningar";
 const options = {
 body: data.notification?.body || "En ny bokning har gjorts.",
