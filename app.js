@@ -105,7 +105,7 @@ function renderAll(){
   if(!user)return;
   document.querySelectorAll(".admin-only").forEach(x=>x.classList.toggle("hidden",!isAdmin()));$("adminSection").classList.toggle("hidden",!isAdmin());
   $("resourceGrid").innerHTML=resources.length?resources.map(resourceCard).join(""):'<div class="card" style="padding:18px">Inga bokningsobjekt ännu.</div>';
-$("upcomingList").innerHTML = "";
+
   if(currentResourceId&&!resourceById(currentResourceId)&&resources.length)currentResourceId=resources[0].id;
   const r=resourceById(currentResourceId);$("resourceTitle").textContent=r?`${r.icon||"📅"} ${r.name}`:"Kalender";
   $("resourcePills").innerHTML=resources.map(x=>`<button class="pill ${x.id===currentResourceId?"active":""}" data-resource="${x.id}">${esc(x.icon||"📅")} ${esc(x.name)}</button>`).join("");

@@ -337,7 +337,7 @@ main {
     display: block;
     
     margin-top: 7px;
-    white-space: nowrap;
+    white-space: normal;
     overflow: hidden;
     text-overflow: ellipsis;
     font-size: 11px
@@ -555,12 +555,12 @@ dialog form {
     }
 
     .day {
-        min-height: 53px;
+        min-height: 85px;
         padding: 5px
     }
 
     .day small {
-        display: none
+        display: block;
     }
 
     .resource-grid {
