@@ -23,7 +23,7 @@ const esc=(t="")=>String(t).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"
 const slug=s=>(s||"resurs").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,35)||"resurs";
 function errText(e){const c=e?.code||"";if(c.includes("invalid-credential"))return"Fel e-postadress eller lösenord.";if(c.includes("permission-denied"))return"Du saknar behörighet för detta.";if(c.includes("network"))return"Kontrollera internetanslutningen.";return e?.message||"Något gick fel."}
 function resourceById(id){return resources.find(r=>r.id===id)}
-function displayNameFor(b){if(b.userId===user?.uid)return profile?.displayName||"Christin";return b.displayName||b.userEmail||"Familjemedlem"}
+function displayNameFor(b){const name=b.userId===user?.uid?(profile?.displayName||"Christin"):(b.displayName||b.userEmail||"Familjemedlem");const first=String(name).split("@")[0].trim().split(/\s+/)[0];return first.toLowerCase()==="marialundqvist"?"Maria":first.charAt(0).toLocaleUpperCase("sv-SE")+first.slice(1)}
 $("loginForm").onsubmit=async e=>{e.preventDefault();$("loginError").textContent="Loggar in…";try{await signInWithEmailAndPassword(auth,$("emailInput").value.trim(),$("passwordInput").value);$("loginError").textContent=""}catch(x){$("loginError").textContent=errText(x)}};
 $("logoutBtn").onclick=()=>signOut(auth);
 onAuthStateChanged(auth,async u=>{
@@ -36,12 +36,38 @@ onAuthStateChanged(auth,async u=>{
   showTab("home");
 });
 async function loadProfile(){
-  const ref=doc(db,"profiles",user.uid),snap=await getDoc(ref);
-  if(snap.exists())profile=snap.data();else{
-    profile={displayName:isAdmin()?"Christin":(user.email?.split("@")[0]||"Familjemedlem"),email:user.email,updatedAt:serverTimestamp()};
-    try{await setDoc(ref,profile)}catch{}
+  const names = {
+    "frelund94@live.se": "Fredrik",
+    "marialundqvist@outlook.com": "Maria",
+    "daniel.lundqvist98@gmail.com": "Daniel",
+    "victoria.valentin01@gmail.com": "Victoria",
+    "thomas@brainscan.se": "Thomas"
+  };
+
+  const ref = doc(db, "profiles", user.uid);
+  const snap = await getDoc(ref);
+  const email = (user.email || "").toLowerCase();
+  const familyName = names[email];
+
+  if(snap.exists()){
+    profile = snap.data();
+  }else{
+    profile = {
+      displayName: familyName || (isAdmin() ? "Christin" : email.split("@")[0] || "Familjemedlem"),
+      email: user.email
+    };
+    try{await setDoc(ref, {...profile, updatedAt:serverTimestamp()})}catch{}
   }
-  $("welcomeName").textContent=profile.displayName||"Christin";$("displayNameInput").value=profile.displayName||"";
+
+  if(familyName && profile.displayName !== familyName){
+    try{
+      await setDoc(ref, {displayName:familyName}, {merge:true});
+      profile.displayName = familyName;
+    }catch{}
+  }
+
+  $("welcomeName").textContent = profile.displayName || "Christin";
+  $("displayNameInput").value = profile.displayName || "";
 }
 function listenData(){
   $("syncStatus").textContent="Synkroniserar…";
@@ -83,7 +109,11 @@ $("upcomingList").innerHTML = "";
   if(currentResourceId&&!resourceById(currentResourceId)&&resources.length)currentResourceId=resources[0].id;
   const r=resourceById(currentResourceId);$("resourceTitle").textContent=r?`${r.icon||"📅"} ${r.name}`:"Kalender";
   $("resourcePills").innerHTML=resources.map(x=>`<button class="pill ${x.id===currentResourceId?"active":""}" data-resource="${x.id}">${esc(x.icon||"📅")} ${esc(x.name)}</button>`).join("");
-  const rb=bookings.filter(b=>b.resourceId===currentResourceId);$("resourceBookings").innerHTML=rb.length?rb.map(bookingCard).join(""):'<div class="card muted" style="padding:18px">Inga bokningar för detta objekt.</div>';
+  const today=iso(new Date());
+  
+
+ const rb=bookings.filter(b=>b.end>=today);
+const past=bookings.filter(b=>b.resourceId===currentResourceId&&b.end<today);;$("resourceBookings").innerHTML=rb.length?rb.map(bookingCard).join(""):'<div class="card muted" style="padding:18px">Inga bokningar för detta objekt.</div>';
   $("resourceAdminList").innerHTML=resources.length?resources.map(x=>`<div class="card admin-row"><div><strong>${esc(x.icon||"📅")} ${esc(x.name)}</strong><div class="muted">${esc(x.description||"")}</div></div><div class="admin-actions"><button class="ghost" data-edit-resource="${x.id}">Ändra</button><button class="ghost" data-archive-resource="${x.id}">Arkivera</button><button class="danger" data-delete-resource="${x.id}">Ta bort</button></div></div>`).join(""):'<div class="card muted" style="padding:16px">Inga aktiva objekt.</div>';
   const archived=allResources.filter(x=>x.active===false);
   $("archivedResourceList").innerHTML=archived.length?archived.map(x=>`<div class="card admin-row"><div><strong>${esc(x.icon||"📅")} ${esc(x.name)}</strong><div class="muted">${esc(x.description||"")}</div></div><div class="admin-actions"><button class="primary" data-restore-resource="${x.id}">Återställ</button><button class="danger" data-delete-resource="${x.id}">Ta bort</button></div></div>`).join(""):'<div class="card muted" style="padding:16px">Inga arkiverade objekt.</div>';
@@ -119,18 +149,27 @@ for(let d=1;d<=n;d++){
   h+=`<div class="week-cell">v. ${weekNumber(new Date(y,m,d,12))}</div>`;
 } 
   const dt=iso(new Date(y,m,d,12));
-  const b=bookings.find(x=>x.resourceId===currentResourceId&&dt>=x.start&&dt<=x.end);
+  const dayBookings=bookings.filter(x=>dt>=x.start&&dt<=x.end);
+const b=dayBookings[0];
   const mine=b?.userId===user?.uid;
 
 
 
 h+=`<div class="day ${b?"busy":""} ${mine?"mine":""} ${dt===today?"today":""}">
   <strong>${d}</strong>
-  ${b?`<small>${esc(displayNameFor(b))}</small>`:""}
+  ${dayBookings.map(b=>`<small>${esc(resourceById(b.resourceId)?.icon || "📅")} ${esc(displayNameFor(b))}</small>`).join("")}
   <button aria-label="${b?"Bokad "+displayNameFor(b):"Boka "+dt}" data-day="${dt}"></button>
 </div>`;
-  }$("calendarGrid").innerHTML=h;document.querySelectorAll("[data-day]").forEach(x=>x.onclick=()=>{const dt=x.dataset.day,b=bookings.find(v=>v.resourceId===currentResourceId&&dt>=v.start&&dt<=v.end);if(b)alert(`${displayNameFor(b)} har bokat ${fmt(b.start)}–${fmt(b.end)}${b.comment?`\n${b.comment}`:""}`);else openBooking(currentResourceId,dt)});
-}
+  }$("calendarGrid").innerHTML=h;
+document.querySelectorAll("[data-day]").forEach(x=>x.onclick=()=>{
+  const dt=x.dataset.day;
+  const dayBookings=bookings.filter(b=>dt>=b.start&&dt<=b.end);
+  if(dayBookings.length){
+    alert(dayBookings.map(b=>`${resourceById(b.resourceId)?.icon||"📅"} ${displayNameFor(b)}: ${fmt(b.start)}–${fmt(b.end)}${b.comment?`\n${b.comment}`:""}`).join("\n\n"));
+  }else{
+    openBooking(currentResourceId,dt);
+  }
+});}
 $("prevMonth").onclick=()=>{viewDate=new Date(viewDate.getFullYear(),viewDate.getMonth()-1,1);renderCalendar();renderOverviewCalendar()};
 $("nextMonth").onclick=()=>{viewDate=new Date(viewDate.getFullYear(),viewDate.getMonth()+1,1);renderCalendar();renderOverviewCalendar()};
 $("overviewPrevMonth").onclick=()=>{viewDate=new Date(viewDate.getFullYear(),viewDate.getMonth()-1,1);renderCalendar();renderOverviewCalendar()};

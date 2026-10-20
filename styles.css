@@ -190,7 +190,7 @@ main {
 }
 
 .hero {
-    padding: 22px;
+    padding: 14px;
     margin-bottom: 20px;
     background: linear-gradient(145deg, #fff, #eef8f3)
 }
@@ -209,13 +209,13 @@ main {
 
 .resource-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 220px));
     gap: 14px
 }
 
 .resource-card {
-    padding: 12px;
-    min-height: 150px;
+    padding: 8px;
+    min-height: 80px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -235,7 +235,7 @@ main {
 }
 
 .resource-icon {
-    font-size: 34px
+    font-size: 14px
 }
 
 .resource-card h3 {
@@ -248,7 +248,7 @@ main {
 }
 
 .resource-actions {
-    display: flex;
+    display: flex;flex-direction: column;
     gap: 8px;
     margin-top: 14px
 }
@@ -334,7 +334,7 @@ main {
 }
 
 .day small {
-    display: none;
+    display: block;
     
     margin-top: 7px;
     white-space: nowrap;
@@ -564,7 +564,7 @@ dialog form {
     }
 
     .resource-grid {
-        grid-template-columns: 1fr
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     .color-row {
