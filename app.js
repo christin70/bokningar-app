@@ -93,8 +93,8 @@ function showTab(name){
 }
 function resourceCard(r){
   const today=iso(new Date()),next=bookings.filter(b=>b.resourceId===r.id&&b.end>=today)[0];
-  const line=next?`${fmt(next.start)}–${fmt(next.end)} · ${esc(displayNameFor(next))}`:"Ledig – inga kommande bokningar";
-  return `<article class="card resource-card" style="--accent:${esc(r.color||"#155e4b")}"><div><div class="resource-icon">${esc(r.icon||"📅")}</div><h3>${esc(r.name)}</h3><p class="muted">${esc(r.description||"")}</p><p class="status">${line}</p></div><div class="resource-actions"><button class="ghost" data-open-cal="${r.id}">Kalender</button><button class="primary" data-book="${r.id}">Boka</button></div></article>`;
+
+  return `<article class="card resource-card" style="--accent:${esc(r.color||"#155e4b")}"><div><div class="resource-icon">${esc(r.icon||"📅")}</div><h3>${esc(r.name)}</h3></div><div class="resource-actions"><button class="ghost" data-open-cal="${r.id}">Kalender</button><button class="primary" data-book="${r.id}">Boka</button></div></article>`;
 }
 function bookingCard(b){
   const r=resourceById(b.resourceId)||{name:b.resource||"Bokning",color:"#155e4b"};
@@ -174,7 +174,7 @@ $("prevMonth").onclick=()=>{viewDate=new Date(viewDate.getFullYear(),viewDate.ge
 $("nextMonth").onclick=()=>{viewDate=new Date(viewDate.getFullYear(),viewDate.getMonth()+1,1);renderCalendar();renderOverviewCalendar()};
 $("overviewPrevMonth").onclick=()=>{viewDate=new Date(viewDate.getFullYear(),viewDate.getMonth()-1,1);renderCalendar();renderOverviewCalendar()};
 $("overviewNextMonth").onclick=()=>{viewDate=new Date(viewDate.getFullYear(),viewDate.getMonth()+1,1);renderCalendar();renderOverviewCalendar()};
-$("newBookingBtn").onclick=()=>openBooking(currentResourceId);$("quickBookBtn").onclick=()=>openBooking(currentResourceId||resources[0]?.id);
+$("newBookingBtn").onclick=()=>openBooking(currentResourceId);
 function openBooking(resourceId,day=""){currentResourceId=resourceId||currentResourceId;const r=resourceById(currentResourceId);if(!r)return alert("Lägg först till ett bokningsobjekt.");$("bookingForm").reset();$("dialogResource").textContent=`${r.icon||"📅"} ${r.name}`;$("formError").textContent="";const t=iso(new Date()),chosen=day||t;$("startDate").min=t;$("endDate").min=t;$("startDate").value=chosen;$("endDate").value=chosen;$("bookingDialog").showModal()}
 $("startDate").onchange=()=>{$("endDate").min=$("startDate").value;if(!$("endDate").value||$("endDate").value<$("startDate").value)$("endDate").value=$("startDate").value};
 $("bookingForm").onsubmit=async e=>{
@@ -210,12 +210,23 @@ try {
 $("bookingDialog").close()}catch(x){$("formError").textContent=x.message==="DUBBEL"?"Något av datumen är redan bokat.":errText(x)}
 };
 async function removeBooking(id){
-  const b=bookings.find(x=>x.id===id);if(!b||(!isAdmin()&&b.userId!==user.uid)||!confirm("Vill du ta bort bokningen?"))return;
-  try{await runTransaction(db,async tx=>{
-    const lockRefs=dates(b.start,b.end).map(d=>doc(db,"bookingLocks",`${b.resourceId||slug(b.resource)}__${d}`));const snaps=[];
-    for(const ref of lockRefs)snaps.push(await tx.get(ref));tx.delete(doc(db,"bookings",id));
-    snaps.forEach((s,i)=>{if(s.exists()&&s.data().bookingId===id)tx.delete(lockRefs[i])});
-  })}catch(x){alert(errText(x))}
+  const b=bookings.find(x=>x.id===id);
+  if(!b || b.userId!==user.uid || !confirm("Vill du ta bort bokningen?"))return;
+  try {
+    const idToken=await user.getIdToken();
+    const response=await fetch("/.netlify/functions/send-notification",{
+      method:"POST",
+      headers:{"Content-Type":"application/json","Authorization":`Bearer ${idToken}`},
+      body:JSON.stringify({bookingId:id,type:"cancel"})
+    });
+    const result=await response.json().catch(()=>({}));
+    if(!response.ok){
+      throw new Error(result.error || `Avbokningen misslyckades (${response.status})`);
+    }
+    if(result.notificationPending){
+      console.warn("Bokningen är avbokad men notisen kunde inte bekräftas.");
+    }
+  }catch(x){alert(errText(x))}
 }
 $("profileForm").onsubmit=async e=>{e.preventDefault();const name=$("displayNameInput").value.trim();if(!name)return;try{await setDoc(doc(db,"profiles",user.uid),{displayName:name,email:user.email,updatedAt:serverTimestamp()},{merge:true});profile={...profile,displayName:name};$("welcomeName").textContent=name;$("profileMsg").textContent="Sparat.";renderAll()}catch(x){$("profileMsg").textContent=errText(x)}};
 $("passwordForm").onsubmit = async e => {
