@@ -640,3 +640,14 @@ dialog form {
   opacity: 0.7;
   white-space: nowrap;
 }
+.welcome-compact {
+  padding: 16px 20px;
+}
+
+.welcome-compact .hero-row {
+  display: block;
+}
+
+.welcome-compact h2 {
+  margin: 4px 0 0;
+}
