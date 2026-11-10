@@ -119,6 +119,9 @@ const adminAuth = getAuth(firebase);
             tokens.push(doc.data().token);
         });
         let sent = 0;
+        if (tokens.length === 0) {
+  throw new Error("Inga mottagare hittades för avbokningsnotisen");
+}
         if (tokens.length) {
           const result = await getMessaging(firebase).sendEachForMulticast({
             tokens:[...new Set(tokens)],
